@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1072366859918",
+    "project_id": "obiapp-4f9ee",
+    "storage_bucket": "obiapp-4f9ee.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1072366859918:android:be45c9ba6e3c3516fe3bdf",
+        "android_client_info": {
+          "package_name": "com.obiapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1072366859918-f1i3umoos14dd7nlecgqmnogvmpua8i8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_DZXVqvKbkXhNPHSUfFPl4r69YrJCz-A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1072366859918-f1i3umoos14dd7nlecgqmnogvmpua8i8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
