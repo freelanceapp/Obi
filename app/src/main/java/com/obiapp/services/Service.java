@@ -18,6 +18,7 @@ import com.obiapp.models.SingleAdminMessageDataModel;
 import com.obiapp.models.SingleCouponModel;
 import com.obiapp.models.SingleMessageDataModel;
 import com.obiapp.models.SingleProductDataModel;
+import com.obiapp.models.SliderModel;
 import com.obiapp.models.StatusResponse;
 import com.obiapp.models.TypeDataModel;
 import com.obiapp.models.UserModel;
@@ -114,11 +115,10 @@ public interface Service {
     );
 
     @GET("api/home-link-filter")
-    Call<ProductsDataModel> getProducts(@Query(value = "search_key") String search_key,
-                                        @Query(value = "using_my_location") String using_my_location
-
+    Call<ProductsDataModel> getProducts(@Query(value = "search_key") String search_key
     );
-
+    @GET("api/home-sliders")
+    Call<SliderModel> getSlider();
     @GET("api/offerSlider")
     Call<ProductsDataModel> getLatestOffer();
 

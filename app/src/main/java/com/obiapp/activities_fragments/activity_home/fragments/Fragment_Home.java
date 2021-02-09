@@ -20,10 +20,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.obiapp.R;
 import com.obiapp.activities_fragments.activity_home.HomeActivity;
 import com.obiapp.activities_fragments.activity_product_details.ProductDetailsActivity;
+import com.obiapp.adapters.HomeSliderAdapter;
 import com.obiapp.adapters.ProductAdapter;
+import com.obiapp.adapters.SliderAdapter;
 import com.obiapp.databinding.FragmentHomeBinding;
 import com.obiapp.models.ProductModel;
 import com.obiapp.models.ProductsDataModel;
+import com.obiapp.models.SliderModel;
 import com.obiapp.models.UserModel;
 import com.obiapp.preferences.Preferences;
 import com.obiapp.remote.Api;
@@ -49,7 +52,8 @@ public class Fragment_Home extends Fragment {
     private List<ProductModel> productModelList;
     private LinearLayoutManager manager;
     private Call<ProductsDataModel> call;
-
+    private HomeSliderAdapter sliderAdapter;
+    private List<SliderModel> sliderModelList;
 
     public static Fragment_Home newInstance() {
         return new Fragment_Home();
@@ -73,6 +77,7 @@ public class Fragment_Home extends Fragment {
 
         activity = (HomeActivity) getActivity();
         productModelList = new ArrayList<>();
+        sliderModelList = new ArrayList<>();
         preferences = Preferences.getInstance();
         userModel = preferences.getUserData(activity);
         Paper.init(activity);
@@ -128,7 +133,75 @@ public class Fragment_Home extends Fragment {
 
         });
 
+        sliderAdapter = new HomeSliderAdapter(sliderModelList, activity);
+        binding.tab.setupWithViewPager(binding.pager);
+        binding.pager.setAdapter(sliderAdapter);
 
+        getSliderData();
+
+    }
+
+    private void getSliderData() {
+        Api.getService(Tags.base_url)
+                .getSlider()
+                .enqueue(new Callback<SliderModel>() {
+                    @Override
+                    public void onResponse(Call<SliderModel> call, Response<SliderModel> response) {
+                        binding.progBar1.setVisibility(View.GONE);
+                        if (response.isSuccessful()) {
+
+                            if (response.body() != null && response.body().getData() != null) {
+                             /*   if (response.body().getData().size() > 0) {
+                                    updateSliderUi(response.body().getData());
+
+                                } else {
+                                    binding.flPager.setVisibility(View.GONE);
+
+                                }*/
+                            }
+
+
+                        } else {
+                            binding.progBar1.setVisibility(View.GONE);
+
+                            switch (response.code()) {
+                                case 500:
+                                    Toast.makeText(activity, "Server Error", Toast.LENGTH_SHORT).show();
+                                    break;
+
+                                default:
+                                    Toast.makeText(activity, getString(R.string.failed), Toast.LENGTH_SHORT).show();
+                                    break;
+                            }
+                            try {
+                                Log.e("error_code", response.code() + "_" + response.errorBody().string());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+
+                    }
+
+                    @Override
+                    public void onFailure(Call<SliderModel> call, Throwable t) {
+                        try {
+                            binding.progBar1.setVisibility(View.GONE);
+                            if (t.getMessage() != null) {
+                                Log.e("error", t.getMessage());
+                                if (t.getMessage().toLowerCase().contains("failed to connect") || t.getMessage().toLowerCase().contains("unable to resolve host")) {
+                                    Toast.makeText(activity, getString(R.string.something), Toast.LENGTH_SHORT).show();
+                                } else if (t.getMessage().toLowerCase().contains("socket") || t.getMessage().toLowerCase().contains("canceled")) {
+                                } else {
+                                    Toast.makeText(activity, t.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                        } catch (Exception e) {
+
+                        }
+                    }
+                });
     }
 
     private void getProducts(String query) {
@@ -139,7 +212,7 @@ public class Fragment_Home extends Fragment {
             }
 
             call = Api.getService(Tags.base_url)
-                    .getProducts(query, "no");
+                    .getProducts(query);
             call.enqueue(new Callback<ProductsDataModel>() {
                 @Override
                 public void onResponse(Call<ProductsDataModel> call, Response<ProductsDataModel> response) {

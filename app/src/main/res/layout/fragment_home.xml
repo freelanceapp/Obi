@@ -24,8 +24,38 @@
         android:orientation="vertical"
         >
         <FrameLayout
+            android:id="@+id/flPager"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="200dp"
+
+            >
+            <androidx.viewpager.widget.ViewPager
+                android:id="@+id/pager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tab"
+                android:layout_width="wrap_content"
+                android:layout_height="8dp"
+                android:layout_gravity="bottom|start"
+                android:layout_margin="10dp"
+                app:tabBackground="@drawable/tab_indicator"
+                app:tabGravity="fill"
+                app:tabIndicatorHeight="0dp"
+                app:tabMaxWidth="7dp"
+                app:tabMode="scrollable" />
+
+            <ProgressBar
+                android:id="@+id/progBar1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
             android:background="@color/gray2"
             >
             <LinearLayout

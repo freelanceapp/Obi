@@ -55,7 +55,7 @@ public class NotificationActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_notification);
+        binding = DataBindingUtil.setContentView(  this, R.layout.activity_notification);
         initView();
     }
 
@@ -64,7 +64,7 @@ public class NotificationActivity extends AppCompatActivity {
         Paper.init(this);
         lang = Paper.book().read("lang", Locale.getDefault().getLanguage());
         binding.setLang(lang);
-        binding.progBar.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(this, R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
+        binding.progBar.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(   this, R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
 
         preferences = Preferences.getInstance();
         userModel = preferences.getUserData(this);
