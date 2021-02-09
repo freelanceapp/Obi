@@ -98,6 +98,7 @@ public class HomeActivity extends AppCompatActivity {
         binding.setLang(lang);
         toggle = new ActionBarDrawerToggle(this, binding.drawerLayout, binding.toolbar, R.string.open, R.string.close);
         toggle.syncState();
+
         binding.toolbar.setNavigationIcon(R.drawable.ic_squares);
         binding.toolbar.getNavigationIcon().setColorFilter(ContextCompat.getColor(this, R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
         binding.flNotification.setOnClickListener(view -> {

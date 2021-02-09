@@ -53,7 +53,7 @@ public class Fragment_Home extends Fragment {
     private LinearLayoutManager manager;
     private Call<ProductsDataModel> call;
     private HomeSliderAdapter sliderAdapter;
-    private List<SliderModel> sliderModelList;
+    private List<SliderModel.Data> sliderModelList;
 
     public static Fragment_Home newInstance() {
         return new Fragment_Home();
