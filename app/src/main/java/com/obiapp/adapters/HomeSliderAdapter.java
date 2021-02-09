@@ -19,11 +19,11 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 public class HomeSliderAdapter extends PagerAdapter {
-    private List<SliderModel> list ;
+    private List<SliderModel.Data> list ;
     private Context context;
     private LayoutInflater inflater;
 
-    public HomeSliderAdapter(List<SliderModel> list, Context context) {
+    public HomeSliderAdapter(List<SliderModel.Data> list, Context context) {
         this.list = list;
         this.context = context;
         inflater = LayoutInflater.from(context);
