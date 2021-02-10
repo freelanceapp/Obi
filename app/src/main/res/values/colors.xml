@@ -27,4 +27,6 @@
     <color name="color_gray_trans">#55e0e0e0</color>
     <color name="trans_black">#55000000</color>
     <color name="gray1_trans">#ddf5f5f5</color>
+    <color name="color2">#F0FAFF</color>
+
 </resources>

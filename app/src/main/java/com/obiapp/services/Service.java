@@ -2,6 +2,7 @@ package com.obiapp.services;
 
 import com.obiapp.models.AdminMessageDataModel;
 import com.obiapp.models.AdminRoomDataModel;
+import com.obiapp.models.AllCatogryModel;
 import com.obiapp.models.CouponDataModel;
 import com.obiapp.models.DepartmentDataModel;
 import com.obiapp.models.ItemAddAdsDataModel;
@@ -433,4 +434,9 @@ public interface Service {
 
 
     );
+    @GET("api/categories")
+    Call<AllCatogryModel> getcategories(
+
+    );
+
 }

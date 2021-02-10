@@ -45,8 +45,14 @@
                     android:id="@+id/toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
+                    android:layout_margin="0dp"
                     android:background="@color/white"
+                    android:contentInsetStart="0dp"
+                    android:contentInsetLeft="0dp"
+                    android:contentInsetEnd="0dp"
+                    android:contentInsetRight="0dp"
                     app:contentInsetEnd="0dp"
+                    app:contentInsetEndWithActions="0dp"
                     app:contentInsetLeft="0dp"
                     app:contentInsetRight="0dp"
                     app:contentInsetStart="0dp"
@@ -62,13 +68,12 @@
                         android:orientation="horizontal">
 
 
-
                         <FrameLayout
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_weight="1"
-                            android:padding="3dp"
-                            android:background="@color/white">
+                            android:background="@color/white"
+                            android:padding="3dp">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
@@ -112,9 +117,10 @@
                             android:layout_weight="1"
                             android:gravity="center"
                             android:text="@{title}"
-                            android:visibility="gone"
                             android:textColor="@color/white"
-                            android:textSize="18sp" />
+                            android:textSize="18sp"
+                            android:visibility="gone" />
+
                         <ImageView
                             android:layout_width="50dp"
                             android:layout_height="match_parent"
@@ -124,13 +130,14 @@
                             android:paddingBottom="5dp"
                             android:scaleType="centerCrop"
                             android:src="@drawable/logo2" />
+
                         <FrameLayout
                             android:id="@+id/flNotification"
                             android:layout_width="40dp"
                             android:layout_height="40dp"
-                            android:visibility="gone"
                             android:layout_gravity="center_vertical|end"
-                            android:background="@drawable/circle_gray">
+                            android:background="@drawable/circle_gray"
+                            android:visibility="gone">
 
                             <ImageView
                                 android:id="@+id/imageNotification"

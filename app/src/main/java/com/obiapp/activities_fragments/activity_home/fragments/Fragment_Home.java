@@ -16,16 +16,20 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.obiapp.R;
 import com.obiapp.activities_fragments.activity_home.HomeActivity;
 import com.obiapp.activities_fragments.activity_product_details.ProductDetailsActivity;
+import com.obiapp.adapters.Category_Adapter;
 import com.obiapp.adapters.HomeSliderAdapter;
 import com.obiapp.adapters.ProductAdapter;
 import com.obiapp.adapters.SliderAdapter;
 import com.obiapp.databinding.FragmentHomeBinding;
+import com.obiapp.models.AllCatogryModel;
 import com.obiapp.models.ProductModel;
 import com.obiapp.models.ProductsDataModel;
+import com.obiapp.models.SingleCategoryModel;
 import com.obiapp.models.SliderModel;
 import com.obiapp.models.UserModel;
 import com.obiapp.preferences.Preferences;
@@ -34,6 +38,7 @@ import com.obiapp.tags.Tags;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import io.paperdb.Paper;
@@ -54,6 +59,8 @@ public class Fragment_Home extends Fragment {
     private Call<ProductsDataModel> call;
     private HomeSliderAdapter sliderAdapter;
     private List<SliderModel.Data> sliderModelList;
+    private List<SingleCategoryModel> categoryList;
+    private Category_Adapter categoryAdapter;
 
     public static Fragment_Home newInstance() {
         return new Fragment_Home();
@@ -74,7 +81,7 @@ public class Fragment_Home extends Fragment {
     }
 
     private void initView() {
-
+        categoryList = new ArrayList<>();
         activity = (HomeActivity) getActivity();
         productModelList = new ArrayList<>();
         sliderModelList = new ArrayList<>();
@@ -85,8 +92,13 @@ public class Fragment_Home extends Fragment {
         binding.swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
         manager = new LinearLayoutManager(activity);
         productAdapter = new ProductAdapter(productModelList, activity, this);
+        categoryAdapter = new Category_Adapter(categoryList, activity, this);
+
         binding.recView.setLayoutManager(manager);
         binding.recView.setAdapter(productAdapter);
+        binding.recViewCategory.setLayoutManager(new LinearLayoutManager(activity, RecyclerView.HORIZONTAL, false));
+        binding.recViewCategory.setAdapter(categoryAdapter);
+
         binding.edtSearch.setOnEditorActionListener((textView, i, keyEvent) -> {
             if (i == EditorInfo.IME_ACTION_SEARCH) {
                 String query = binding.edtSearch.getText().toString();
@@ -112,7 +124,7 @@ public class Fragment_Home extends Fragment {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                if (editable.toString().isEmpty()){
+                if (editable.toString().isEmpty()) {
                     productModelList.clear();
                     productAdapter.notifyDataSetChanged();
                     binding.swipeRefresh.setRefreshing(false);
@@ -138,7 +150,7 @@ public class Fragment_Home extends Fragment {
         binding.pager.setAdapter(sliderAdapter);
 
         getSliderData();
-
+        getCategoryData();
     }
 
     private void getSliderData() {
@@ -151,6 +163,17 @@ public class Fragment_Home extends Fragment {
                         if (response.isSuccessful()) {
 
                             if (response.body() != null && response.body().getData() != null) {
+                                if (response.body().getStatus() == 200) {
+                                    if (response.body().getData().size() > 0) {
+                                        updateSliderUi(response.body().getData());
+
+                                    } else {
+                                        binding.flPager.setVisibility(View.GONE);
+
+                                    }
+                                } else {
+                                    binding.flPager.setVisibility(View.GONE);
+                                }
                              /*   if (response.body().getData().size() > 0) {
                                     updateSliderUi(response.body().getData());
 
@@ -204,10 +227,15 @@ public class Fragment_Home extends Fragment {
                 });
     }
 
+    private void updateSliderUi(List<SliderModel.Data> data) {
+        sliderModelList.addAll(data);
+        sliderAdapter.notifyDataSetChanged();
+    }
+
     private void getProducts(String query) {
         try {
 
-            if (call!=null){
+            if (call != null) {
                 call.cancel();
             }
 
@@ -263,9 +291,9 @@ public class Fragment_Home extends Fragment {
                             Log.e("error", t.getMessage());
                             if (t.getMessage().toLowerCase().contains("failed to connect") || t.getMessage().toLowerCase().contains("unable to resolve host")) {
                                 Toast.makeText(activity, R.string.something, Toast.LENGTH_SHORT).show();
-                            } else if (t.getMessage().toLowerCase().contains("socket")||t.getMessage().toLowerCase().contains("canceled")){
+                            } else if (t.getMessage().toLowerCase().contains("socket") || t.getMessage().toLowerCase().contains("canceled")) {
 
-                            }else {
+                            } else {
                                 Toast.makeText(activity, t.getMessage(), Toast.LENGTH_SHORT).show();
                             }
                         }
@@ -279,6 +307,83 @@ public class Fragment_Home extends Fragment {
         }
     }
 
+    private void getCategoryData() {
+        binding.cardView.setVisibility(View.VISIBLE);
+
+        binding.progBarCategory.setVisibility(View.VISIBLE);
+
+        Api.getService(Tags.base_url).getcategories().enqueue(new Callback<AllCatogryModel>() {
+            @Override
+            public void onResponse(Call<AllCatogryModel> call, Response<AllCatogryModel> response) {
+                binding.progBarCategory.setVisibility(View.GONE);
+
+                if (response.isSuccessful() && response.body() != null) {
+
+                    if (response.body().getStatus() == 200) {
+                        Log.e("dlldldlld", response.code() + "dldlldldld");
+
+                        if (response.body().getData().size() > 0) {
+                            binding.cardView.setVisibility(View.VISIBLE);
+
+                            categoryList.clear();
+                            categoryList.addAll(response.body().getData());
+                            categoryAdapter.notifyDataSetChanged();
+                        } else {
+                            binding.cardView.setVisibility(View.GONE);
+                        }
+
+
+                    } else {
+                        binding.cardView.setVisibility(View.GONE);
+                    }
+
+
+                } else {
+                    try {
+
+                        Log.e("errorssssss", response.code() + "_" + response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    if (response.code() == 500) {
+                        Toast.makeText(activity, "Server Error", Toast.LENGTH_SHORT).show();
+
+
+                    } else {
+                        Toast.makeText(activity, getString(R.string.failed), Toast.LENGTH_SHORT).show();
+
+
+                    }
+                }
+
+
+            }
+
+            @Override
+            public void onFailure(Call<AllCatogryModel> call, Throwable t) {
+                binding.progBarCategory.setVisibility(View.GONE);
+                try {
+                    binding.progBarCategory.setVisibility(View.GONE);
+                    if (t.getMessage() != null) {
+                        Log.e("error", t.getMessage());
+                        if (t.getMessage().toLowerCase().contains("failed to connect") || t.getMessage().toLowerCase().contains("unable to resolve host")) {
+                            Toast.makeText(activity, R.string.something, Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(activity, t.getMessage(), Toast.LENGTH_SHORT).show();
+                            Log.e("error:", t.getMessage());
+                        }
+                    }
+
+                } catch (Exception e) {
+                }
+
+            }
+        });
+
+
+    }
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -290,7 +395,7 @@ public class Fragment_Home extends Fragment {
 
     public void setProductItemData(ProductModel productModel) {
         Intent intent = new Intent(activity, ProductDetailsActivity.class);
-        intent.putExtra("product_id",productModel.getId());
+        intent.putExtra("product_id", productModel.getId());
         startActivity(intent);
     }
 }
