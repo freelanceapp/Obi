@@ -35,7 +35,7 @@ public class ProductModel implements Serializable {
    private SubCategory sub_category;
    private List<ProductImageModel> product_images;
    private List<ProductDetail> product_details;
-   private List<ProductType> product_types;
+   private ProductType product_type;
 
     public int getId() {
         return id;
@@ -149,8 +149,8 @@ public class ProductModel implements Serializable {
         return product_details;
     }
 
-    public List<ProductType> getProduct_types() {
-        return product_types;
+    public ProductType getProduct_type() {
+        return product_type;
     }
 
     public String getIs_favorite() {

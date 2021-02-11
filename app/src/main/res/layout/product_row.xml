@@ -105,7 +105,7 @@
                         <ImageView
                             android:layout_width="15dp"
                             android:layout_height="15dp"
-                            android:src="@drawable/ic_calendar"
+                            android:src="@drawable/ic_group"
                             app:tint="@color/colorPrimary" />
                     </FrameLayout>
 
@@ -115,7 +115,7 @@
                         
                         android:ellipsize="end"
                         android:maxLines="2"
-                        date='@{model.created_at??""}'
+                        android:text="@{model.product_type.type.title}"
                         android:textColor="@color/gray6"
                         android:textSize="12sp"
                         android:layout_marginStart="10dp"
@@ -135,7 +135,7 @@
                         <ImageView
                             android:layout_width="15dp"
                             android:layout_height="15dp"
-                            android:src="@drawable/ic_map"
+                            android:src="@drawable/ic_calendar"
                             app:tint="@color/colorPrimary" />
                     </FrameLayout>
 
@@ -144,7 +144,7 @@
                         android:layout_height="wrap_content"
                         android:ellipsize="end"
                         android:singleLine="true"
-                        android:text="@{model.address}"
+                        date='@{model.created_at??""}'
                         android:textColor="@color/gray6"
                         android:textSize="12sp"
                         android:layout_marginStart="10dp"

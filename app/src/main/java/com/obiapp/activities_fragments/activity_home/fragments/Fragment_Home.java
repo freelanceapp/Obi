@@ -61,6 +61,8 @@ public class Fragment_Home extends Fragment {
     private List<SliderModel.Data> sliderModelList;
     private List<SingleCategoryModel> categoryList;
     private Category_Adapter categoryAdapter;
+    private String id;
+    private String query=null;
 
     public static Fragment_Home newInstance() {
         return new Fragment_Home();
@@ -101,7 +103,7 @@ public class Fragment_Home extends Fragment {
 
         binding.edtSearch.setOnEditorActionListener((textView, i, keyEvent) -> {
             if (i == EditorInfo.IME_ACTION_SEARCH) {
-                String query = binding.edtSearch.getText().toString();
+                query = binding.edtSearch.getText().toString();
                 if (!query.isEmpty()) {
                     productModelList.clear();
                     productAdapter.notifyDataSetChanged();
@@ -233,6 +235,12 @@ public class Fragment_Home extends Fragment {
     }
 
     private void getProducts(String query) {
+        if(userModel!=null){
+            id=userModel.getData().getId()+"";
+        }
+        else {
+            id=null;
+        }
         try {
 
             if (call != null) {
@@ -240,7 +248,7 @@ public class Fragment_Home extends Fragment {
             }
 
             call = Api.getService(Tags.base_url)
-                    .getProducts(query);
+                    .getProducts(id,query);
             call.enqueue(new Callback<ProductsDataModel>() {
                 @Override
                 public void onResponse(Call<ProductsDataModel> call, Response<ProductsDataModel> response) {
@@ -299,11 +307,13 @@ public class Fragment_Home extends Fragment {
                         }
 
                     } catch (Exception e) {
+                        Log.e("sllslls",e.toString());
+
                     }
                 }
             });
         } catch (Exception e) {
-
+Log.e("sllslls",e.toString());
         }
     }
 
@@ -397,5 +407,20 @@ public class Fragment_Home extends Fragment {
         Intent intent = new Intent(activity, ProductDetailsActivity.class);
         intent.putExtra("product_id", productModel.getId());
         startActivity(intent);
+    }
+
+    public void search(String query) {
+        productModelList.clear();
+        productAdapter.notifyDataSetChanged();
+        binding.swipeRefresh.setRefreshing(false);
+        binding.progBar.setVisibility(View.VISIBLE);
+        binding.tvNoData.setVisibility(View.GONE);
+        if(query.isEmpty()){
+            this.query =null;
+        getProducts(null);}
+        else {
+            this.query =query;
+            getProducts(this.query);
+        }
     }
 }

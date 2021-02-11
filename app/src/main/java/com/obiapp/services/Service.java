@@ -116,7 +116,9 @@ public interface Service {
     );
 
     @GET("api/home-link-filter")
-    Call<ProductsDataModel> getProducts(@Query(value = "search_key") String search_key
+    Call<ProductsDataModel> getProducts(
+            @Query(value = "user_id") String user_id,
+            @Query(value = "search_key") String search_key
     );
     @GET("api/home-sliders")
     Call<SliderModel> getSlider();

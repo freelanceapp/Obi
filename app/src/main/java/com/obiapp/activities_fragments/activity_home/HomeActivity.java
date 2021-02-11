@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -132,7 +134,26 @@ public class HomeActivity extends AppCompatActivity {
             displayFragmentChat();
 
         });
+        binding.edtSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+                  if(fragment_home!=null){
+                      fragment_home.search(editable.toString());
+                  }
+
+            }
+        });
         binding.llCoupon.setOnClickListener(view -> {
             Intent intent = new Intent(this, MyCouponsActivity.class);
             startActivity(intent);
