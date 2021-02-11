@@ -116,10 +116,14 @@ public class Fragment_Offer extends Fragment {
                         if (response.isSuccessful() && response.body() != null) {
                             categoryModelList.addAll(response.body().getData().getGoogle_categories());
                             categoryAdapter.notifyDataSetChanged();
+                            if (categoryModelList.size()>0){
+                                binding.tvNoData.setVisibility(View.GONE);
+                            }else {
+                                binding.tvNoData.setVisibility(View.VISIBLE);
+
+                            }
 
                         } else {
-                            Log.e("2", "2");
-
                             skeletonCategory.hide();
 
                             try {

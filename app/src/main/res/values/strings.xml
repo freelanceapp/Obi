@@ -146,5 +146,6 @@
     <string name="getting_your_location">Getting your location...</string>
     <string name="open_now">Open</string>
     <string name="closed">Closed</string>
+    <string name="no_data">No data to show</string>
 
 </resources>
