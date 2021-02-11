@@ -45,11 +45,7 @@ public class LatestOfferAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             myHolder.binding.setModel(list.get(position));
 
             myHolder.itemView.setOnClickListener(view -> {
-                if (fragment instanceof Fragment_Offer) {
 
-                    Fragment_Offer fragment_offer = (Fragment_Offer) fragment;
-                    fragment_offer.setProductItemData(list.get(myHolder.getAdapterPosition()));
-                }
             });
 
             /*if (list.get(myHolder.getAdapterPosition()).getProduct_images().size() > 0) {

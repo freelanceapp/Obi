@@ -46,11 +46,7 @@ public class OfferAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             myHolder.binding.setModel(list.get(position));
             myHolder.binding.tvOldPrice.setPaintFlags(myHolder.binding.tvOldPrice.getPaintFlags()| Paint.STRIKE_THRU_TEXT_FLAG);
             myHolder.itemView.setOnClickListener(view -> {
-                if (fragment instanceof Fragment_Offer) {
 
-                    Fragment_Offer fragment_offer = (Fragment_Offer) fragment;
-                    fragment_offer.setProductItemData(list.get(myHolder.getAdapterPosition()));
-                }
             });
 
             /*if (list.get(myHolder.getAdapterPosition()).getProduct_images().size() > 0) {

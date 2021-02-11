@@ -138,5 +138,6 @@
     <string name="work_hour_not_aval">ساعات العمل غير متاحة</string>
     <string name="home3">موقعي</string>
     <string name="getting_your_location">جار تحديد موقعك...</string>
-
+    <string name="open_now">مفتوح</string>
+    <string name="closed">مغلق</string>
 </resources>

@@ -139,6 +139,7 @@
     <string name="work_hour_not_aval">Work Hour Not Available</string>
     <string name="home3">Home</string>
     <string name="getting_your_location">Getting your location...</string>
-
+    <string name="open_now">Open</string>
+    <string name="closed">Closed</string>
 
 </resources>
