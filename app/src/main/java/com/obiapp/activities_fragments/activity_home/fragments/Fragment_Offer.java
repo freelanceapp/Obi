@@ -95,6 +95,8 @@ public class Fragment_Offer extends Fragment {
                 .load(R.layout.category_row)
                 .show();
 
+        getData();
+
     }
 
     public void getData() {
