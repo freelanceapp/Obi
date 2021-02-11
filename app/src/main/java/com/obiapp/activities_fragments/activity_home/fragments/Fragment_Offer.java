@@ -83,18 +83,21 @@ public class Fragment_Offer extends Fragment {
         binding.setLang(lang);
         preferences = Preferences.getInstance();
         userModel = preferences.getUserData(activity);
+
+
+
+
         binding.recView.setLayoutManager(new GridLayoutManager(activity, 2));
         categoryAdapter = new PlaceCategoryAdapter(categoryModelList, activity,this);
         binding.recView.setAdapter(categoryAdapter);
-
         skeletonCategory = Skeleton.bind(binding.recView)
                 .frozen(false)
                 .duration(1000)
                 .shimmer(true)
-                .count(8)
+                .count(96)
+                .adapter(categoryAdapter)
                 .load(R.layout.category_row)
                 .show();
-
         getData();
 
     }
@@ -107,7 +110,6 @@ public class Fragment_Offer extends Fragment {
 
 
         categoryModelList.clear();
-        categoryAdapter.notifyDataSetChanged();
         Api.getService(Tags.base_url)
                 .getGoogleCategory()
                 .enqueue(new Callback<CategoryDataModel>() {
@@ -115,8 +117,9 @@ public class Fragment_Offer extends Fragment {
                     public void onResponse(Call<CategoryDataModel> call, Response<CategoryDataModel> response) {
                         skeletonCategory.hide();
                         if (response.isSuccessful() && response.body() != null) {
-                            categoryModelList.addAll(response.body().getData().getGoogle_categories());
+                            categoryModelList.addAll(response.body().getGoogle_categories());
                             categoryAdapter.notifyDataSetChanged();
+                            Log.e("size",categoryModelList.size()+"");
                             if (categoryModelList.size()>0){
                                 binding.tvNoData.setVisibility(View.GONE);
                             }else {
@@ -137,6 +140,7 @@ public class Fragment_Offer extends Fragment {
 
                     }
 
+
                     @Override
                     public void onFailure(Call<CategoryDataModel> call, Throwable t) {
                         try {
@@ -153,7 +157,7 @@ public class Fragment_Offer extends Fragment {
                                 }
                             }
                         } catch (Exception e) {
-
+                            Log.e("error", e.toString());
                         }
                     }
                 });

@@ -444,7 +444,7 @@ public interface Service {
 
     );
 
-    @GET("api/google-categories")
+    @GET("api/googleCategories")
     Call<CategoryDataModel> getGoogleCategory();
 
     @GET("place/nearbysearch/json")
