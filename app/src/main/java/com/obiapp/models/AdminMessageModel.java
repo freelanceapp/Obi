@@ -3,6 +3,7 @@ package com.obiapp.models;
 import java.io.Serializable;
 
 public class AdminMessageModel implements Serializable {
+
     private int id;
     private int chat_room_id;
     private int from_user_id;

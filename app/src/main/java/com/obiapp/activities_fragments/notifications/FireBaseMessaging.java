@@ -86,8 +86,8 @@ public class FireBaseMessaging extends FirebaseMessagingService {
                         MessageModel.RoomModel roomModel = new MessageModel.RoomModel();
 
 
-                        MessageModel messageModel = new MessageModel(Integer.parseInt(id), Integer.parseInt(room_id), Integer.parseInt(from_user_id), Integer.parseInt(to_user_id), type, message, file, Long.parseLong(date), roomModel, fromUserModel, toUserModel);
-                        EventBus.getDefault().post(messageModel);
+                       /* MessageModel messageModel = new MessageModel(Integer.parseInt(id), Integer.parseInt(room_id), Integer.parseInt(from_user_id), Integer.parseInt(to_user_id), type, message, file, Long.parseLong(date), roomModel, fromUserModel, toUserModel);
+                        EventBus.getDefault().post(messageModel);*/
 
                     } else {
                         manageNotification(map);
@@ -227,10 +227,10 @@ public class FireBaseMessaging extends FirebaseMessagingService {
                 }
 
 
-                ChatUserModel chatUserModel = new ChatUserModel(Integer.parseInt(chat_user_id), chat_user_name, chat_user_image, Integer.parseInt(room_id));
+               /* ChatUserModel chatUserModel = new ChatUserModel(Integer.parseInt(chat_user_id), chat_user_name, chat_user_image, Integer.parseInt(room_id));
 
                 intent.putExtra("data", chatUserModel);
-
+*/
             }
             builder.setContentTitle(title);
 
@@ -346,9 +346,9 @@ public class FireBaseMessaging extends FirebaseMessagingService {
                 }
 
 
-                ChatUserModel chatUserModel = new ChatUserModel(Integer.parseInt(chat_user_id), chat_user_name, chat_user_image, Integer.parseInt(room_id));
+               /* ChatUserModel chatUserModel = new ChatUserModel(Integer.parseInt(chat_user_id), chat_user_name, chat_user_image, Integer.parseInt(room_id));
 
-                intent.putExtra("data", chatUserModel);
+                intent.putExtra("data", chatUserModel);*/
 
             }
             builder.setContentTitle(title);

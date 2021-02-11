@@ -95,19 +95,6 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"/>
                     </FrameLayout>
-
-                    <FrameLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="56dp"
-                        android:background="@drawable/small_rounded_stroke_gray"
-                        android:layout_marginTop="10dp"
-                        >
-                        <Spinner
-                            android:id="@+id/spinnerSubCategory"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"/>
-                    </FrameLayout>
-
                     <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
@@ -119,6 +106,19 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"/>
                     </FrameLayout>
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:background="@drawable/small_rounded_stroke_gray"
+                        android:layout_marginTop="10dp"
+                        >
+                        <Spinner
+                            android:id="@+id/spinnerGovernate"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"/>
+                    </FrameLayout>
+
 
 
                     <TextView
@@ -335,134 +335,10 @@
                             android:singleLine="true"
                             android:inputType="numberDecimal"
                             android:textSize="14sp"
-                            android:text="@={model.old_price}"
-                            error="@{model.error_old_price}"
+                            android:text="@={model.price}"
+                            error="@{model.error_price}"
                             />
                     </LinearLayout>
-
-                    <CheckBox
-                        android:id="@+id/checkboxOffer"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:textColor="@color/black"
-                        android:paddingStart="8dp"
-                        android:paddingEnd="8dp"
-                        android:textSize="16sp"
-                        android:text="@string/add_offer"
-                        android:layout_marginBottom="10dp"
-                        />
-                    <net.cachapa.expandablelayout.ExpandableLayout
-                        android:id="@+id/expandLayout2"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:el_parallax=".5"
-                        app:el_duration="500"
-                        app:el_expanded="false"
-                        >
-
-                        <LinearLayout
-                            android:id="@+id/llOffer"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:background="@color/gray0"
-                            android:padding="8dp"
-
-                            >
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textSize="16sp"
-                                android:textColor="@color/black"
-                                android:text="@string/price_after_offer"
-                                />
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="56dp"
-                                android:orientation="horizontal"
-                                android:layout_gravity="center_vertical"
-                                android:background="@drawable/small_rounded_stroke_gray"
-                                android:layout_marginTop="10dp"
-
-                                >
-                                <Space
-                                    android:layout_width="10dp"
-                                    android:layout_height="0dp"/>
-                                <ImageView
-                                    android:layout_width="24dp"
-                                    android:layout_height="24dp"
-                                    android:src="@drawable/ic_credit_card"
-                                    app:tint="@color/gray4"
-                                    android:padding="3dp"
-                                    android:layout_gravity="center_vertical"
-                                    />
-                                <EditText
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:background="@color/transparent"
-                                    android:hint="@string/price_after_offer"
-                                    android:textColor="@color/black"
-                                    android:textColorHint="@color/gray4"
-                                    android:paddingStart="10dp"
-                                    android:paddingEnd="10dp"
-                                    android:singleLine="true"
-                                    android:inputType="numberDecimal"
-                                    android:textSize="14sp"
-                                    android:text="@={model.price}"
-                                    error="@{model.error_price}"
-                                    />
-                            </LinearLayout>
-
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textSize="16sp"
-                                android:textColor="@color/black"
-                                android:text="@string/offer_value"
-                                />
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="56dp"
-                                android:orientation="horizontal"
-                                android:layout_gravity="center_vertical"
-                                android:background="@drawable/small_rounded_stroke_gray"
-                                android:layout_marginTop="10dp"
-
-                                >
-                                <Space
-                                    android:layout_width="10dp"
-                                    android:layout_height="0dp"/>
-                                <ImageView
-                                    android:layout_width="24dp"
-                                    android:layout_height="24dp"
-                                    android:src="@drawable/ic_credit_card"
-                                    app:tint="@color/gray4"
-                                    android:padding="3dp"
-                                    android:layout_gravity="center_vertical"
-                                    />
-                                <EditText
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:background="@color/transparent"
-                                    android:hint="@string/offer_value"
-                                    android:textColor="@color/black"
-                                    android:textColorHint="@color/gray4"
-                                    android:paddingStart="10dp"
-                                    android:paddingEnd="10dp"
-                                    android:singleLine="true"
-                                    android:inputType="numberDecimal"
-                                    android:textSize="14sp"
-                                    android:text="@={model.offer_value}"
-                                    error="@{model.error_offer_value}"
-                                    />
-                            </LinearLayout>
-
-                        </LinearLayout>
-
-
-                    </net.cachapa.expandablelayout.ExpandableLayout>
 
                     <TextView
                         android:layout_width="wrap_content"

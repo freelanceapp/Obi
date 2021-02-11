@@ -67,13 +67,15 @@ import com.obiapp.activities_fragments.FragmentMapTouchListener;
 import com.obiapp.activities_fragments.activite_swear.SwearActivity;
 import com.obiapp.adapters.ImageAdsAdapter;
 import com.obiapp.adapters.SpinnerDepartmentAdapter;
-import com.obiapp.adapters.SpinnerSubDepartmentAdapter;
+import com.obiapp.adapters.SpinnerGovernorateAdapter;
 import com.obiapp.databinding.ActivityAddAdsBinding;
 import com.obiapp.databinding.ItemAddAdsBinding;
 import com.obiapp.language.Language;
 import com.obiapp.models.AddAdsModel;
 import com.obiapp.models.DepartmentDataModel;
 import com.obiapp.models.DepartmentModel;
+import com.obiapp.models.GovernorateDataModel;
+import com.obiapp.models.GovernorateModel;
 import com.obiapp.models.ItemAddAds;
 import com.obiapp.models.ItemAddAdsDataModel;
 import com.obiapp.models.PlaceGeocodeData;
@@ -127,22 +129,20 @@ public class AddAdsActivity extends AppCompatActivity implements OnMapReadyCallb
     private final int loc_req = 1225;
     private FragmentMapTouchListener fragment;
     private List<DepartmentModel> departmentModelList;
-    private List<DepartmentModel.SubCategory> subDepartmentList;
     private List<TypeModel> typeModelList;
     private SpinnerDepartmentAdapter spinnerDepartmentAdapter;
-    private SpinnerSubDepartmentAdapter spinnerSubDepartmentAdapter;
     private SpinnerTypeAdapter spinnerTypeAdapter;
 
     private ImageAdsAdapter imageAdsAdapter;
     private boolean isVideoAvailable = false;
     private List<ItemAddAds> itemAddAdsList;
     private List<View> viewList;
-    private List<Integer> selectedType;
     private AddAdsModel model;
     private Preferences preferences;
     private UserModel userModel;
-    private boolean isOffer = false;
 
+    private List<GovernorateModel> governorateModelList;
+    private SpinnerGovernorateAdapter spinnerGovernorateAdapter;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -154,22 +154,12 @@ public class AddAdsActivity extends AppCompatActivity implements OnMapReadyCallb
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_add_ads);
-        getDataFromIntent();
-
         initView();
-    }
-
-    private void getDataFromIntent() {
-        Intent intent = getIntent();
-        if (intent.hasExtra("offer")){
-            isOffer = true;
-        }
     }
 
 
     private void initView() {
-        selectedType = new ArrayList<>();
-        subDepartmentList = new ArrayList<>();
+        governorateModelList = new ArrayList<>();
         typeModelList = new ArrayList<>();
         model = new AddAdsModel();
         viewList = new ArrayList<>();
@@ -188,12 +178,6 @@ public class AddAdsActivity extends AppCompatActivity implements OnMapReadyCallb
         departmentModel.setId(0);
         departmentModel.setTitle(getString(R.string.ch_dept));
         departmentModelList.add(departmentModel);
-
-
-        DepartmentModel.SubCategory subCategory = new DepartmentModel.SubCategory();
-        subCategory.setId(0);
-        subCategory.setTitle(getString(R.string.ch_sub_dept));
-        subDepartmentList.add(subCategory);
 
 
         TypeModel typeModel = new TypeModel();
@@ -223,22 +207,18 @@ public class AddAdsActivity extends AppCompatActivity implements OnMapReadyCallb
         binding.spinnerCategory.setAdapter(spinnerDepartmentAdapter);
 
 
-        spinnerSubDepartmentAdapter = new SpinnerSubDepartmentAdapter(subDepartmentList, this);
-        binding.spinnerSubCategory.setAdapter(spinnerSubDepartmentAdapter);
-
-
         spinnerTypeAdapter = new SpinnerTypeAdapter(typeModelList, this);
         binding.spinnerType.setAdapter(spinnerTypeAdapter);
 
+        GovernorateModel governorateModel = new GovernorateModel(0, "إختر المحافظة", "Choose governorate");
+        governorateModelList.add(governorateModel);
+
+        spinnerGovernorateAdapter = new SpinnerGovernorateAdapter(governorateModelList, this);
+        binding.spinnerGovernate.setAdapter(spinnerGovernorateAdapter);
 
         binding.spinnerCategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                subDepartmentList.clear();
-                subCategory.setId(0);
-                subCategory.setTitle(getString(R.string.ch_sub_dept));
-                subDepartmentList.add(subCategory);
-
 
                 typeModelList.clear();
                 TypeModel typeModel = new TypeModel();
@@ -255,16 +235,11 @@ public class AddAdsActivity extends AppCompatActivity implements OnMapReadyCallb
                     }
                 } else {
                     model.setCategory_id(departmentModelList.get(i).getId());
-                    if (departmentModelList.get(i).getSub_categories() != null) {
-                        subDepartmentList.addAll(departmentModelList.get(i).getSub_categories());
+                    getTypes(model.getCategory_id());
 
-
-                    }
-
-                    //getItems(categoryModelList.get(i).getId());
+                    getItems(model.getCategory_id());
                 }
 
-                spinnerSubDepartmentAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -272,25 +247,15 @@ public class AddAdsActivity extends AppCompatActivity implements OnMapReadyCallb
 
             }
         });
-        binding.spinnerSubCategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+        binding.spinnerGovernate.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
 
                 if (i == 0) {
-                    typeModelList.clear();
-                    TypeModel typeModel = new TypeModel();
-                    typeModel.setId(0);
-                    typeModel.setTitle(getString(R.string.ch_types));
-                    typeModelList.add(typeModel);
-                    spinnerTypeAdapter.notifyDataSetChanged();
-                    model.setSub_category_id(0);
-                    if (itemAddAdsList.size() > 0) {
-                        removeItems();
-                    }
+                    model.setGovernate_id(0);
                 } else {
-                    model.setSub_category_id(subDepartmentList.get(i).getId());
-                    getTypes(model.getCategory_id(), subDepartmentList.get(i).getId());
-                    getItems(subDepartmentList.get(i).getId());
+                    model.setGovernate_id(governorateModelList.get(i).getId());
                 }
 
             }
@@ -300,10 +265,10 @@ public class AddAdsActivity extends AppCompatActivity implements OnMapReadyCallb
 
             }
         });
+
         binding.spinnerType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                selectedType.clear();
 
                 if (i == 0) {
                     typeModelList.clear();
@@ -311,13 +276,14 @@ public class AddAdsActivity extends AppCompatActivity implements OnMapReadyCallb
                     typeModel.setId(0);
                     typeModel.setTitle(getString(R.string.ch_types));
                     typeModelList.add(typeModel);
+                    model.setType_id(0);
+
                     spinnerTypeAdapter.notifyDataSetChanged();
-                    model.setSub_category_id(0);
                     if (itemAddAdsList.size() > 0) {
                         removeItems();
                     }
                 } else {
-                    selectedType.add(typeModelList.get(i).getId());
+                    model.setType_id(typeModelList.get(i).getId());
                 }
 
             }
@@ -328,11 +294,11 @@ public class AddAdsActivity extends AppCompatActivity implements OnMapReadyCallb
             }
         });
         binding.checkboxSwear.setOnClickListener(view -> {
-            if (binding.checkboxSwear.isChecked()){
+            if (binding.checkboxSwear.isChecked()) {
                 model.setSwear(true);
                 Intent intent = new Intent(this, SwearActivity.class);
                 startActivity(intent);
-            }else {
+            } else {
                 model.setSwear(false);
 
             }
@@ -356,29 +322,13 @@ public class AddAdsActivity extends AppCompatActivity implements OnMapReadyCallb
             checkVideoPermission();
         });
 
-        if(isOffer){
-            binding.checkboxOffer.setVisibility(View.INVISIBLE);
-            model.setHave_offer("with_offer");
-            binding.expandLayout2.expand(true);
-        }
-
-        binding.checkboxOffer.setOnClickListener(view -> {
-            if (binding.checkboxOffer.isChecked()) {
-                model.setHave_offer("with_offer");
-                binding.expandLayout2.expand(true);
-
-            } else {
-                model.setHave_offer("without_offer");
-                binding.expandLayout2.collapse(true);
 
 
-            }
-
-        });
         binding.llBack.setOnClickListener(view -> back());
 
         binding.btnSend.setOnClickListener(view -> checkDataValid());
         getDepartment();
+        getGovernorate();
 
 
     }
@@ -390,7 +340,6 @@ public class AddAdsActivity extends AppCompatActivity implements OnMapReadyCallb
         List<ItemAddAds> itemAddAdsList = new ArrayList<>();
         for (ItemAddAds itemAddAds : this.itemAddAdsList) {
             itemAddAds.setValue_of_attribute("");
-            Log.e("title", itemAddAds.getTitle_of_attribute() + "__");
             ItemAddAdsBinding itemAddAdsBinding = DataBindingUtil.inflate(LayoutInflater.from(this), R.layout.item_add_ads, null, false);
             itemAddAdsBinding.tvTitle.setText(itemAddAds.getTitle_of_attribute());
             itemAddAdsBinding.edt.setHint(itemAddAds.getTitle_of_attribute());
@@ -476,10 +425,10 @@ public class AddAdsActivity extends AppCompatActivity implements OnMapReadyCallb
 
     }
 
-    private void getTypes(int category_id, int suc_category_id) {
+    private void getTypes(int category_id) {
         try {
             Api.getService(Tags.base_url)
-                    .getTypes(category_id, suc_category_id)
+                    .getTypes(category_id)
                     .enqueue(new Callback<TypeDataModel>() {
                         @Override
                         public void onResponse(Call<TypeDataModel> call, Response<TypeDataModel> response) {
@@ -538,6 +487,72 @@ public class AddAdsActivity extends AppCompatActivity implements OnMapReadyCallb
         } catch (Exception e) {
 
         }
+    }
+
+    private void getGovernorate() {
+        try {
+
+            Api.getService(Tags.base_url)
+                    .getGovernorate()
+                    .enqueue(new Callback<GovernorateDataModel>() {
+                        @Override
+                        public void onResponse(Call<GovernorateDataModel> call, Response<GovernorateDataModel> response) {
+                            if (response.isSuccessful() && response.body() != null) {
+                                if (response.body().getStatus() == 200) {
+                                    if (response.body().getData().size() > 0) {
+                                        governorateModelList.clear();
+                                        GovernorateModel governorateModel = new GovernorateModel(0, "إختر المحافظة", "Choose governorate");
+
+                                        governorateModelList.add(governorateModel);
+
+                                        governorateModelList.addAll(response.body().getData());
+                                        runOnUiThread(() -> spinnerGovernorateAdapter.notifyDataSetChanged());
+
+                                    }
+                                } else {
+                                    Toast.makeText(AddAdsActivity.this, getString(R.string.failed), Toast.LENGTH_SHORT).show();
+                                }
+                            } else {
+
+                                if (response.code() == 500) {
+                                    Toast.makeText(AddAdsActivity.this, "Server Error", Toast.LENGTH_SHORT).show();
+
+
+                                } else {
+                                    Toast.makeText(AddAdsActivity.this, getString(R.string.failed), Toast.LENGTH_SHORT).show();
+
+                                    try {
+
+                                        Log.e("error", response.code() + "_" + response.errorBody().string());
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<GovernorateDataModel> call, Throwable t) {
+                            try {
+
+                                if (t.getMessage() != null) {
+                                    Log.e("error", t.getMessage());
+                                    if (t.getMessage().toLowerCase().contains("failed to connect") || t.getMessage().toLowerCase().contains("unable to resolve host")) {
+                                        Toast.makeText(AddAdsActivity.this, R.string.something, Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(AddAdsActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+
+                            } catch (Exception e) {
+                            }
+                        }
+                    });
+        } catch (Exception e) {
+
+        }
+
+
     }
 
 
@@ -655,42 +670,27 @@ public class AddAdsActivity extends AppCompatActivity implements OnMapReadyCallb
         dialog.show();
         RequestBody title_part = Common.getRequestBodyText(model.getName());
         RequestBody category_id_part = Common.getRequestBodyText(String.valueOf(model.getCategory_id()));
-        RequestBody sub_category_id_part = Common.getRequestBodyText(String.valueOf(model.getSub_category_id()));
+        RequestBody governorate_id_part = Common.getRequestBodyText(String.valueOf(model.getGovernate_id()));
+        RequestBody type_id_part = Common.getRequestBodyText(String.valueOf(model.getType_id()));
+        RequestBody price_part = Common.getRequestBodyText(String.valueOf(model.getPrice()));
+        RequestBody details_part = Common.getRequestBodyText(String.valueOf(model.getDetails()));
 
-        RequestBody old_price_part = Common.getRequestBodyText(model.getOld_price());
-        RequestBody have_offer_part = Common.getRequestBodyText(model.getHave_offer());
-
-        RequestBody offer_price_part;
-        RequestBody offer_value_part;
-        if (model.getHave_offer().equals("with_offer")){
-            offer_price_part = Common.getRequestBodyText(model.getPrice());
-            offer_value_part = Common.getRequestBodyText(model.getOffer_value());
-
-        }else {
-            offer_price_part = Common.getRequestBodyText(model.getOld_price());
-            offer_value_part = Common.getRequestBodyText("0");
-
-        }
         RequestBody address_part = Common.getRequestBodyText(model.getAddress());
         RequestBody lat_part = Common.getRequestBodyText(String.valueOf(model.getLat()));
         RequestBody lng_part = Common.getRequestBodyText(String.valueOf(model.getLng()));
-        MultipartBody.Part main_image_part = Common.getMultiPart(this,Uri.parse(imagesUriList.get(0)),"main_image");
+        MultipartBody.Part main_image_part = Common.getMultiPart(this, Uri.parse(imagesUriList.get(0)), "main_image");
 
-        List<RequestBody> types = new ArrayList<>();;
-        if (selectedType.size()>0){
-            RequestBody  requestBody = Common.getRequestBodyText(selectedType.get(0).toString()) ;
-            types.add(requestBody);
-        }
+
         Map<String, RequestBody> map = new HashMap<>();
-        for (int index=0;index<model.getItemAddAdsList().size();index++){
-            map.put("product_details["+index+"][title_of_attribute]",Common.getRequestBodyText(model.getItemAddAdsList().get(index).getTitle_of_attribute()));
-            map.put("product_details["+index+"][value_of_attribute]",Common.getRequestBodyText(model.getItemAddAdsList().get(index).getValue_of_attribute()));
+        for (int index = 0; index < model.getItemAddAdsList().size(); index++) {
+            map.put("product_details[" + index + "][title_of_attribute]", Common.getRequestBodyText(model.getItemAddAdsList().get(index).getTitle_of_attribute()));
+            map.put("product_details[" + index + "][value_of_attribute]", Common.getRequestBodyText(model.getItemAddAdsList().get(index).getValue_of_attribute()));
 
         }
 
 
         Api.getService(Tags.base_url)
-                .addAdsWithoutVideoWithList("Bearer "+userModel.getData().getToken(),category_id_part,sub_category_id_part,title_part,offer_price_part,old_price_part,address_part,lat_part,lng_part,have_offer_part,offer_value_part,main_image_part,getMultipartImage(),types,map)
+                .addAdsWithoutVideoWithList("Bearer " + userModel.getData().getToken(), category_id_part, governorate_id_part, type_id_part, title_part, price_part, address_part, lat_part, lng_part, details_part, main_image_part, getMultipartImage(), map)
                 .enqueue(new Callback<StatusResponse>() {
                     @Override
                     public void onResponse(Call<StatusResponse> call, Response<StatusResponse> response) {
@@ -699,15 +699,16 @@ public class AddAdsActivity extends AppCompatActivity implements OnMapReadyCallb
                             finish();
                         } else {
                             try {
-                                Log.e("error",response.code()+"__"+response.errorBody().string());
+                                Log.e("error", response.code() + "__" + response.errorBody().string());
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
 
                             if (response.code() == 500) {
                                 Toast.makeText(AddAdsActivity.this, "Server Error", Toast.LENGTH_SHORT).show();
-                            }{
-                                Log.e("mmmmmmmmmm",response.code()+"__"+response.errorBody());
+                            }
+                            {
+                                Log.e("mmmmmmmmmm", response.code() + "__" + response.errorBody());
 
                                 Toast.makeText(AddAdsActivity.this, getString(R.string.failed), Toast.LENGTH_SHORT).show();
                             }
@@ -719,12 +720,12 @@ public class AddAdsActivity extends AppCompatActivity implements OnMapReadyCallb
                         try {
                             dialog.dismiss();
                             if (t.getMessage() != null) {
-                                Log.e("mmmmmmmmmm",t.getMessage()+"__");
+                                Log.e("mmmmmmmmmm", t.getMessage() + "__");
 
                                 if (t.getMessage().toLowerCase().contains("failed to connect") || t.getMessage().toLowerCase().contains("unable to resolve host")) {
                                     Toast.makeText(AddAdsActivity.this, getString(R.string.something), Toast.LENGTH_SHORT).show();
                                 } else {
-                                    Log.e("ccccc",t.getMessage());
+                                    Log.e("ccccc", t.getMessage());
 
                                     Toast.makeText(AddAdsActivity.this, getString(R.string.failed), Toast.LENGTH_SHORT).show();
                                 }
@@ -736,45 +737,25 @@ public class AddAdsActivity extends AppCompatActivity implements OnMapReadyCallb
                 });
     }
 
-    private void addAdsWithVideoWithoutList()
-    {
+    private void addAdsWithVideoWithoutList() {
         ProgressDialog dialog = Common.createProgressDialog(this, getString(R.string.wait));
         dialog.setCancelable(false);
         dialog.show();
         RequestBody title_part = Common.getRequestBodyText(model.getName());
         RequestBody category_id_part = Common.getRequestBodyText(String.valueOf(model.getCategory_id()));
-        RequestBody sub_category_id_part = Common.getRequestBodyText(String.valueOf(model.getSub_category_id()));
+        RequestBody governorate_id_part = Common.getRequestBodyText(String.valueOf(model.getGovernate_id()));
+        RequestBody type_id_part = Common.getRequestBodyText(String.valueOf(model.getType_id()));
+        RequestBody price_part = Common.getRequestBodyText(String.valueOf(model.getPrice()));
+        RequestBody details_part = Common.getRequestBodyText(String.valueOf(model.getDetails()));
 
-        RequestBody old_price_part = Common.getRequestBodyText(model.getOld_price());
-        RequestBody have_offer_part = Common.getRequestBodyText(model.getHave_offer());
-
-        RequestBody offer_price_part;
-        RequestBody offer_value_part;
-        if (model.getHave_offer().equals("with_offer")){
-            offer_price_part = Common.getRequestBodyText(model.getPrice());
-            offer_value_part = Common.getRequestBodyText(model.getOffer_value());
-
-        }else {
-            offer_price_part = Common.getRequestBodyText(model.getOld_price());
-            offer_value_part = Common.getRequestBodyText("0");
-
-        }
         RequestBody address_part = Common.getRequestBodyText(model.getAddress());
         RequestBody lat_part = Common.getRequestBodyText(String.valueOf(model.getLat()));
         RequestBody lng_part = Common.getRequestBodyText(String.valueOf(model.getLng()));
-        MultipartBody.Part main_image_part = Common.getMultiPart(this,Uri.parse(imagesUriList.get(0)),"main_image");
-        MultipartBody.Part video_part = Common.getMultiPartVideo(this,videoUri,"video");
-
-        List<RequestBody> types = new ArrayList<>();;
-        if (selectedType.size()>0){
-            RequestBody  requestBody = Common.getRequestBodyText(selectedType.get(0).toString()) ;
-            types.add(requestBody);
-        }
-
-
+        MultipartBody.Part main_image_part = Common.getMultiPart(this, Uri.parse(imagesUriList.get(0)), "main_image");
+        MultipartBody.Part video_part = Common.getMultiPartVideo(this, videoUri, "video");
 
         Api.getService(Tags.base_url)
-                .addAdsWithVideoWithoutList("Bearer "+userModel.getData().getToken(),category_id_part,sub_category_id_part,title_part,offer_price_part,old_price_part,address_part,lat_part,lng_part,have_offer_part,offer_value_part,main_image_part,video_part,getMultipartImage(),types)
+                .addAdsWithVideoWithoutList("Bearer " + userModel.getData().getToken(), category_id_part, governorate_id_part, type_id_part, title_part, price_part, address_part, lat_part, lng_part, details_part, main_image_part, video_part, getMultipartImage())
                 .enqueue(new Callback<StatusResponse>() {
                     @Override
                     public void onResponse(Call<StatusResponse> call, Response<StatusResponse> response) {
@@ -783,15 +764,16 @@ public class AddAdsActivity extends AppCompatActivity implements OnMapReadyCallb
                             finish();
                         } else {
                             try {
-                                Log.e("error",response.code()+"__"+response.errorBody().string());
+                                Log.e("error", response.code() + "__" + response.errorBody().string());
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
 
                             if (response.code() == 500) {
                                 Toast.makeText(AddAdsActivity.this, "Server Error", Toast.LENGTH_SHORT).show();
-                            }{
-                                Log.e("mmmmmmmmmm",response.code()+"__"+response.errorBody());
+                            }
+                            {
+                                Log.e("mmmmmmmmmm", response.code() + "__" + response.errorBody());
 
                                 Toast.makeText(AddAdsActivity.this, getString(R.string.failed), Toast.LENGTH_SHORT).show();
                             }
@@ -803,12 +785,12 @@ public class AddAdsActivity extends AppCompatActivity implements OnMapReadyCallb
                         try {
                             dialog.dismiss();
                             if (t.getMessage() != null) {
-                                Log.e("mmmmmmmmmm",t.getMessage()+"__");
+                                Log.e("mmmmmmmmmm", t.getMessage() + "__");
 
                                 if (t.getMessage().toLowerCase().contains("failed to connect") || t.getMessage().toLowerCase().contains("unable to resolve host")) {
                                     Toast.makeText(AddAdsActivity.this, getString(R.string.something), Toast.LENGTH_SHORT).show();
                                 } else {
-                                    Log.e("ccccc",t.getMessage());
+                                    Log.e("ccccc", t.getMessage());
 
                                     Toast.makeText(AddAdsActivity.this, getString(R.string.failed), Toast.LENGTH_SHORT).show();
                                 }
@@ -821,43 +803,24 @@ public class AddAdsActivity extends AppCompatActivity implements OnMapReadyCallb
 
     }
 
-    private void addAdsWithoutVideoWithoutList()
-    {
+    private void addAdsWithoutVideoWithoutList() {
         ProgressDialog dialog = Common.createProgressDialog(this, getString(R.string.wait));
         dialog.setCancelable(false);
         dialog.show();
         RequestBody title_part = Common.getRequestBodyText(model.getName());
         RequestBody category_id_part = Common.getRequestBodyText(String.valueOf(model.getCategory_id()));
-        RequestBody sub_category_id_part = Common.getRequestBodyText(String.valueOf(model.getSub_category_id()));
+        RequestBody governorate_id = Common.getRequestBodyText(String.valueOf(model.getGovernate_id()));
+        RequestBody type_id = Common.getRequestBodyText(String.valueOf(model.getType_id()));
+        RequestBody details_part = Common.getRequestBodyText(String.valueOf(model.getDetails()));
 
-        RequestBody old_price_part = Common.getRequestBodyText(model.getOld_price());
-        RequestBody have_offer_part = Common.getRequestBodyText(model.getHave_offer());
-
-        RequestBody offer_price_part;
-        RequestBody offer_value_part;
-        if (model.getHave_offer().equals("with_offer")){
-            offer_price_part = Common.getRequestBodyText(model.getPrice());
-            offer_value_part = Common.getRequestBodyText(model.getOffer_value());
-
-        }else {
-            offer_price_part = Common.getRequestBodyText(model.getOld_price());
-            offer_value_part = Common.getRequestBodyText("0");
-
-        }
+        RequestBody price_part = Common.getRequestBodyText(model.getPrice());
         RequestBody address_part = Common.getRequestBodyText(model.getAddress());
         RequestBody lat_part = Common.getRequestBodyText(String.valueOf(model.getLat()));
         RequestBody lng_part = Common.getRequestBodyText(String.valueOf(model.getLng()));
-        MultipartBody.Part main_image_part = Common.getMultiPart(this,Uri.parse(imagesUriList.get(0)),"main_image");
-
-        List<RequestBody> types = new ArrayList<>();;
-        if (selectedType.size()>0){
-            RequestBody  requestBody = Common.getRequestBodyText(selectedType.get(0).toString()) ;
-            types.add(requestBody);
-        }
-
+        MultipartBody.Part main_image_part = Common.getMultiPart(this, Uri.parse(imagesUriList.get(0)), "main_image");
 
         Api.getService(Tags.base_url)
-                .addAdsWithoutVideoWithoutList("Bearer "+userModel.getData().getToken(),category_id_part,sub_category_id_part,title_part,offer_price_part,old_price_part,address_part,lat_part,lng_part,have_offer_part,offer_value_part,main_image_part,getMultipartImage(),types)
+                .addAdsWithoutVideoWithoutList("Bearer " + userModel.getData().getToken(), category_id_part, governorate_id, type_id, title_part, price_part, address_part, lat_part, lng_part, details_part, main_image_part, getMultipartImage())
                 .enqueue(new Callback<StatusResponse>() {
                     @Override
                     public void onResponse(Call<StatusResponse> call, Response<StatusResponse> response) {
@@ -866,15 +829,16 @@ public class AddAdsActivity extends AppCompatActivity implements OnMapReadyCallb
                             finish();
                         } else {
                             try {
-                                Log.e("error",response.code()+"__"+response.errorBody().string());
+                                Log.e("error", response.code() + "__" + response.errorBody().string());
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
 
                             if (response.code() == 500) {
                                 Toast.makeText(AddAdsActivity.this, "Server Error", Toast.LENGTH_SHORT).show();
-                            }{
-                                Log.e("mmmmmmmmmm",response.code()+"__"+response.errorBody());
+                            }
+                            {
+                                Log.e("mmmmmmmmmm", response.code() + "__" + response.errorBody());
 
                                 Toast.makeText(AddAdsActivity.this, getString(R.string.failed), Toast.LENGTH_SHORT).show();
                             }
@@ -886,12 +850,12 @@ public class AddAdsActivity extends AppCompatActivity implements OnMapReadyCallb
                         try {
                             dialog.dismiss();
                             if (t.getMessage() != null) {
-                                Log.e("mmmmmmmmmm",t.getMessage()+"__");
+                                Log.e("mmmmmmmmmm", t.getMessage() + "__");
 
                                 if (t.getMessage().toLowerCase().contains("failed to connect") || t.getMessage().toLowerCase().contains("unable to resolve host")) {
                                     Toast.makeText(AddAdsActivity.this, getString(R.string.something), Toast.LENGTH_SHORT).show();
                                 } else {
-                                    Log.e("ccccc",t.getMessage());
+                                    Log.e("ccccc", t.getMessage());
 
                                     Toast.makeText(AddAdsActivity.this, getString(R.string.failed), Toast.LENGTH_SHORT).show();
                                 }
@@ -903,50 +867,35 @@ public class AddAdsActivity extends AppCompatActivity implements OnMapReadyCallb
                 });
     }
 
-    private void addAdsWithVideoWithList()
-    {
+    private void addAdsWithVideoWithList() {
         ProgressDialog dialog = Common.createProgressDialog(this, getString(R.string.wait));
         dialog.setCancelable(false);
         dialog.show();
         RequestBody title_part = Common.getRequestBodyText(model.getName());
         RequestBody category_id_part = Common.getRequestBodyText(String.valueOf(model.getCategory_id()));
-        RequestBody sub_category_id_part = Common.getRequestBodyText(String.valueOf(model.getSub_category_id()));
+        RequestBody governorate_id_part = Common.getRequestBodyText(String.valueOf(model.getGovernate_id()));
+        RequestBody type_id_part = Common.getRequestBodyText(String.valueOf(model.getType_id()));
+        RequestBody details_part = Common.getRequestBodyText(String.valueOf(model.getDetails()));
 
-        RequestBody old_price_part = Common.getRequestBodyText(model.getOld_price());
-        RequestBody have_offer_part = Common.getRequestBodyText(model.getHave_offer());
+        RequestBody price_part = Common.getRequestBodyText(model.getPrice());
 
-        RequestBody offer_price_part;
-        RequestBody offer_value_part;
-        if (model.getHave_offer().equals("with_offer")){
-            offer_price_part = Common.getRequestBodyText(model.getPrice());
-            offer_value_part = Common.getRequestBodyText(model.getOffer_value());
-
-        }else {
-            offer_price_part = Common.getRequestBodyText(model.getOld_price());
-            offer_value_part = Common.getRequestBodyText("0");
-
-        }
         RequestBody address_part = Common.getRequestBodyText(model.getAddress());
         RequestBody lat_part = Common.getRequestBodyText(String.valueOf(model.getLat()));
         RequestBody lng_part = Common.getRequestBodyText(String.valueOf(model.getLng()));
-        MultipartBody.Part main_image_part = Common.getMultiPart(this,Uri.parse(imagesUriList.get(0)),"main_image");
-        MultipartBody.Part video_part = Common.getMultiPartVideo(this,videoUri,"video");
+        MultipartBody.Part main_image_part = Common.getMultiPart(this, Uri.parse(imagesUriList.get(0)), "main_image");
+        MultipartBody.Part video_part = Common.getMultiPartVideo(this, videoUri, "video");
 
-        List<RequestBody> types = new ArrayList<>();;
-        if (selectedType.size()>0){
-            RequestBody  requestBody = Common.getRequestBodyText(selectedType.get(0).toString()) ;
-            types.add(requestBody);
-        }
+
         Map<String, RequestBody> map = new HashMap<>();
-        for (int index=0;index<model.getItemAddAdsList().size();index++){
-            map.put("product_details["+index+"][title_of_attribute]",Common.getRequestBodyText(model.getItemAddAdsList().get(index).getTitle_of_attribute()));
-            map.put("product_details["+index+"][value_of_attribute]",Common.getRequestBodyText(model.getItemAddAdsList().get(index).getValue_of_attribute()));
+        for (int index = 0; index < model.getItemAddAdsList().size(); index++) {
+            map.put("product_details[" + index + "][title_of_attribute]", Common.getRequestBodyText(model.getItemAddAdsList().get(index).getTitle_of_attribute()));
+            map.put("product_details[" + index + "][value_of_attribute]", Common.getRequestBodyText(model.getItemAddAdsList().get(index).getValue_of_attribute()));
 
         }
 
 
         Api.getService(Tags.base_url)
-                .addAdsWithVideoWithList("Bearer "+userModel.getData().getToken(),category_id_part,sub_category_id_part,title_part,offer_price_part,old_price_part,address_part,lat_part,lng_part,have_offer_part,offer_value_part,main_image_part,video_part,getMultipartImage(),types,map)
+                .addAdsWithVideoWithList("Bearer " + userModel.getData().getToken(), category_id_part, governorate_id_part, type_id_part, title_part, price_part, address_part, lat_part, lng_part, details_part, main_image_part, video_part, getMultipartImage(), map)
                 .enqueue(new Callback<StatusResponse>() {
                     @Override
                     public void onResponse(Call<StatusResponse> call, Response<StatusResponse> response) {
@@ -955,15 +904,16 @@ public class AddAdsActivity extends AppCompatActivity implements OnMapReadyCallb
                             finish();
                         } else {
                             try {
-                                Log.e("error",response.code()+"__"+response.errorBody().string());
+                                Log.e("error", response.code() + "__" + response.errorBody().string());
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
 
                             if (response.code() == 500) {
                                 Toast.makeText(AddAdsActivity.this, "Server Error", Toast.LENGTH_SHORT).show();
-                            }{
-                                Log.e("mmmmmmmmmm",response.code()+"__"+response.errorBody());
+                            }
+                            {
+                                Log.e("mmmmmmmmmm", response.code() + "__" + response.errorBody());
 
                                 Toast.makeText(AddAdsActivity.this, getString(R.string.failed), Toast.LENGTH_SHORT).show();
                             }
@@ -975,12 +925,12 @@ public class AddAdsActivity extends AppCompatActivity implements OnMapReadyCallb
                         try {
                             dialog.dismiss();
                             if (t.getMessage() != null) {
-                                Log.e("mmmmmmmmmm",t.getMessage()+"__");
+                                Log.e("mmmmmmmmmm", t.getMessage() + "__");
 
                                 if (t.getMessage().toLowerCase().contains("failed to connect") || t.getMessage().toLowerCase().contains("unable to resolve host")) {
                                     Toast.makeText(AddAdsActivity.this, getString(R.string.something), Toast.LENGTH_SHORT).show();
                                 } else {
-                                    Log.e("ccccc",t.getMessage());
+                                    Log.e("ccccc", t.getMessage());
 
                                     Toast.makeText(AddAdsActivity.this, getString(R.string.failed), Toast.LENGTH_SHORT).show();
                                 }
@@ -992,8 +942,7 @@ public class AddAdsActivity extends AppCompatActivity implements OnMapReadyCallb
                 });
     }
 
-    private List<MultipartBody.Part> getMultipartImage()
-    {
+    private List<MultipartBody.Part> getMultipartImage() {
         List<MultipartBody.Part> parts = new ArrayList<>();
         for (String path : imagesUriList) {
             Uri uri = Uri.parse(path);

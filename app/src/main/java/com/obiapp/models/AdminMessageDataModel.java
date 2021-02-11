@@ -11,10 +11,15 @@ public class AdminMessageDataModel extends StatusResponse implements Serializabl
     }
 
     public static class Data implements Serializable {
+        private MessageModel.RoomModel room;
         private List<AdminMessageModel> messages;
 
         public List<AdminMessageModel> getMessages() {
             return messages;
+        }
+
+        public MessageModel.RoomModel getRoom() {
+            return room;
         }
     }
 

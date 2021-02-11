@@ -140,7 +140,7 @@ public class ChatAdminActivity extends AppCompatActivity {
     public void getAllMessages() {
 
         Api.getService(Tags.base_url)
-                .getAdminChatMessage("Bearer " + userModel.getData().getToken(), chatUserModel.getRoom_id())
+                .getAdminChatMessage("Bearer " + userModel.getData().getToken(), chatUserModel.getAd_id())
                 .enqueue(new Callback<AdminMessageDataModel>() {
                     @Override
                     public void onResponse(Call<AdminMessageDataModel> call, Response<AdminMessageDataModel> response) {

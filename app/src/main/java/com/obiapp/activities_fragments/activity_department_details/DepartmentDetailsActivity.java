@@ -105,7 +105,7 @@ public class DepartmentDetailsActivity extends AppCompatActivity {
         int suc_category_id = departmentModel.getSub_categories().get(child_pos).getId();
         try {
             Api.getService(Tags.base_url)
-                    .getTypes(category_id,suc_category_id)
+                    .getTypes(category_id)
                     .enqueue(new Callback<TypeDataModel>() {
                         @Override
                         public void onResponse(Call<TypeDataModel> call, Response<TypeDataModel> response) {

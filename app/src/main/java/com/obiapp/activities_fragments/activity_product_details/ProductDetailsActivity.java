@@ -19,11 +19,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.obiapp.R;
 import com.obiapp.activities_fragments.activity_chat.ChatActivity;
+import com.obiapp.activities_fragments.activity_chat_admin.ChatAdminActivity;
 import com.obiapp.activities_fragments.activity_profile_products.ProfileProductsActivity;
 import com.obiapp.adapters.ProductDetailsAdapter;
 import com.obiapp.adapters.SliderAdapter;
 import com.obiapp.databinding.ActivityProductDetailsBinding;
 import com.obiapp.language.Language;
+import com.obiapp.models.AdminMessageDataModel;
 import com.obiapp.models.ChatUserModel;
 import com.obiapp.models.MessageModel;
 import com.obiapp.models.ProductImageModel;
@@ -137,20 +139,20 @@ public class ProductDetailsActivity extends AppCompatActivity {
             startActivity(i);
         });
         binding.imgWarning.setOnClickListener(view -> {
-            if (productModel.getIs_report().equals("yes")) {
+           /* if (productModel.getIs_report().equals("yes")) {
                 addReport(true);
             } else {
                 addReport(false);
 
-            }
+            }*/
         });
 
 
-        binding.image.setOnClickListener(v -> {
+        /*binding.image.setOnClickListener(v -> {
             Intent intent = new Intent(this, ProfileProductsActivity.class);
             intent.putExtra("user_id", productModel.getUser().getId());
             startActivity(intent);
-        });
+        });*/
 
         binding.llBack.setOnClickListener(view -> {
             onBackPressed();
@@ -170,15 +172,15 @@ public class ProductDetailsActivity extends AppCompatActivity {
             dialog.setCanceledOnTouchOutside(false);
             dialog.show();
             Api.getService(Tags.base_url)
-                    .createRoom("Bearer " + userModel.getData().getToken(), userModel.getData().getId(), productModel.getUser().getId())
-                    .enqueue(new Callback<RoomDataModel2>() {
+                    .getAdminChatMessage("Bearer " + userModel.getData().getToken(),productModel.getUser().getId())
+                    .enqueue(new Callback<AdminMessageDataModel>() {
                         @Override
-                        public void onResponse(Call<RoomDataModel2> call, Response<RoomDataModel2> response) {
+                        public void onResponse(Call<AdminMessageDataModel> call, Response<AdminMessageDataModel> response) {
                             dialog.dismiss();
                             if (response.isSuccessful()) {
 
                                 if (response.body() != null && response.body().getStatus() == 200) {
-                                    navigateToChatActivity(response.body().getData());
+                                    navigateToChatActivity(response.body().getData().getRoom());
                                 } else {
                                     Toast.makeText(ProductDetailsActivity.this, getString(R.string.failed), Toast.LENGTH_SHORT).show();
 
@@ -204,7 +206,7 @@ public class ProductDetailsActivity extends AppCompatActivity {
                         }
 
                         @Override
-                        public void onFailure(Call<RoomDataModel2> call, Throwable t) {
+                        public void onFailure(Call<AdminMessageDataModel> call, Throwable t) {
                             try {
                                 dialog.dismiss();
                                 if (t.getMessage() != null) {
@@ -226,8 +228,8 @@ public class ProductDetailsActivity extends AppCompatActivity {
     }
 
     private void navigateToChatActivity(MessageModel.RoomModel data) {
-        ChatUserModel chatUserModel = new ChatUserModel(productModel.getUser().getId(), productModel.getUser().getName(), productModel.getUser().getLogo(), data.getId());
-        Intent intent = new Intent(this, ChatActivity.class);
+        ChatUserModel chatUserModel = new ChatUserModel(data.getAdmin_id(), getString(R.string.admin),"", data.getId(),product_id);
+        Intent intent = new Intent(this, ChatAdminActivity.class);
         intent.putExtra("data", chatUserModel);
         startActivity(intent);
     }
@@ -310,13 +312,13 @@ public class ProductDetailsActivity extends AppCompatActivity {
 
     private void updateUi() {
 
-        if (productModel.getIs_report().equals("yes")) {
+        /*if (productModel.getIs_report().equals("yes")) {
             binding.imgWarning.setColorFilter(ContextCompat.getColor(ProductDetailsActivity.this, R.color.colorPrimary));
         } else {
             binding.imgWarning.setColorFilter(ContextCompat.getColor(ProductDetailsActivity.this, R.color.gray4));
 
         }
-
+*/
 
         if (productModel.getProduct_details() != null && productModel.getProduct_details().size() > 0) {
             productDetailsModelList.addAll(productModel.getProduct_details());
@@ -330,12 +332,12 @@ public class ProductDetailsActivity extends AppCompatActivity {
 
         }
 
-        if (productModel.getIs_report().equals("yes")) {
+       /* if (productModel.getIs_report().equals("yes")) {
             binding.imgWarning.setColorFilter(ContextCompat.getColor(this, R.color.colorPrimary));
         } else {
             binding.imgWarning.setColorFilter(ContextCompat.getColor(this, R.color.gray4));
 
-        }
+        }*/
 
         if (productModel.getVideo() != null) {
             productImageModelList.add(new ProductImageModel(0, productModel.getVideo(), "video"));

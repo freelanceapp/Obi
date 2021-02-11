@@ -146,4 +146,6 @@
     <string name="open_now">مفتوح</string>
     <string name="closed">مغلق</string>
     <string name="no_data">لاتوجد عناصر لعرضها</string>
+    <string name="ch_governorate">إختر المحافظة</string>
+    <string name="ch_type">إختر النوع</string>
 </resources>

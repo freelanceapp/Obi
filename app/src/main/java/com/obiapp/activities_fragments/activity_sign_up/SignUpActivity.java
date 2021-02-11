@@ -393,7 +393,7 @@ public class SignUpActivity extends AppCompatActivity {
         dialog.setCancelable(false);
         dialog.show();
         Api.getService(Tags.base_url)
-                .signUpWithoutImage(signUpModel.getName(), signUpModel.getPhone_code(), signUpModel.getPhone(), "", 0.0, 0.0, "android")
+                .signUpWithoutImage(signUpModel.getName(), signUpModel.getPhone_code(), signUpModel.getPhone(),"asds@asdasda.com", "", 0.0, 0.0, "android")
                 .enqueue(new Callback<UserModel>() {
                     @Override
                     public void onResponse(Call<UserModel> call, Response<UserModel> response) {
@@ -449,7 +449,9 @@ public class SignUpActivity extends AppCompatActivity {
         RequestBody name_part = Common.getRequestBodyText(signUpModel.getName());
         RequestBody phone_code_part = Common.getRequestBodyText(signUpModel.getPhone_code());
         RequestBody phone_part = Common.getRequestBodyText(signUpModel.getPhone());
-        RequestBody address_part = Common.getRequestBodyText("");
+        RequestBody email_part = Common.getRequestBodyText("");
+
+        RequestBody address_part = Common.getRequestBodyText("asds@asdasda.com");
         RequestBody lat_part = Common.getRequestBodyText("0.0");
         RequestBody lng_part = Common.getRequestBodyText("0.0");
         RequestBody software_type_part = Common.getRequestBodyText("android");
@@ -458,7 +460,7 @@ public class SignUpActivity extends AppCompatActivity {
 
 
         Api.getService(Tags.base_url)
-                .signUpWithImage(name_part, phone_code_part, phone_part, address_part, lat_part, lng_part, software_type_part, image)
+                .signUpWithImage(name_part, phone_code_part, phone_part,email_part, address_part, lat_part, lng_part, software_type_part, image)
                 .enqueue(new Callback<UserModel>() {
                     @Override
                     public void onResponse(Call<UserModel> call, Response<UserModel> response) {

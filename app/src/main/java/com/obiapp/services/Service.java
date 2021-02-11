@@ -5,6 +5,7 @@ import com.obiapp.models.AdminRoomDataModel;
 import com.obiapp.models.AllCatogryModel;
 import com.obiapp.models.CouponDataModel;
 import com.obiapp.models.DepartmentDataModel;
+import com.obiapp.models.GovernorateDataModel;
 import com.obiapp.models.ItemAddAdsDataModel;
 import com.obiapp.models.MessageDataModel;
 import com.obiapp.models.NotificationDataModel;
@@ -70,6 +71,8 @@ public interface Service {
     Call<UserModel> signUpWithoutImage(@Field("name") String name,
                                        @Field("phone_code") String phone_code,
                                        @Field("phone") String phone,
+                                       @Field("email") String email,
+
                                        @Field("address") String address,
                                        @Field("latitude") double latitude,
                                        @Field("longitude") double longitude,
@@ -81,6 +84,7 @@ public interface Service {
     Call<UserModel> signUpWithImage(@Part("name") RequestBody name,
                                     @Part("phone_code") RequestBody phone_code,
                                     @Part("phone") RequestBody phone,
+                                    @Part("email") RequestBody email,
                                     @Part("address") RequestBody address,
                                     @Part("latitude") RequestBody latitude,
                                     @Part("longitude") RequestBody longitude,
@@ -131,7 +135,7 @@ public interface Service {
     @GET("api/allOffers")
     Call<ProductsDataModel> getOffer();
 
-    @GET("api/all-categories")
+    @GET("api/categories")
     Call<DepartmentDataModel> getDepartment();
 
     @FormUrlEncoded
@@ -150,9 +154,8 @@ public interface Service {
     );
 
     @FormUrlEncoded
-    @POST("api/getTypesByCatIdOrSubCatId")
-    Call<TypeDataModel> getTypes(@Field("category_id") int category_id,
-                                 @Field("sub_category_id") int sub_category_id
+    @POST("api/getTypesByCatId")
+    Call<TypeDataModel> getTypes(@Field("category_id") int category_id
 
     );
 
@@ -177,8 +180,8 @@ public interface Service {
     );
 
     @FormUrlEncoded
-    @POST("api/allAttribuitesBySubCategoryId")
-    Call<ItemAddAdsDataModel> getItemsAds(@Field("sub_category_id") int sub_category_id
+    @POST("api/allAttribuitesByCategoryId")
+    Call<ItemAddAdsDataModel> getItemsAds(@Field("category_id") int category_id
 
     );
 
@@ -209,19 +212,18 @@ public interface Service {
     @POST("api/addProduct")
     Call<StatusResponse> addAdsWithVideoWithList(@Header("Authorization") String user_token,
                                                  @Part("category_id") RequestBody category_id,
-                                                 @Part("sub_category_id") RequestBody sub_category_id,
+                                                 @Part("governorate_id") RequestBody governorate_id,
+                                                 @Part("type_id") RequestBody type_id,
                                                  @Part("title") RequestBody title,
                                                  @Part("price") RequestBody price,
-                                                 @Part("old_price") RequestBody old_price,
                                                  @Part("address") RequestBody address,
                                                  @Part("latitude") RequestBody latitude,
                                                  @Part("longitude") RequestBody longitude,
-                                                 @Part("have_offer") RequestBody have_offer,
-                                                 @Part("offer_value") RequestBody offer_value,
+                                                 @Part("desc") RequestBody desc,
+
                                                  @Part MultipartBody.Part main_image,
                                                  @Part MultipartBody.Part vedio,
                                                  @Part List<MultipartBody.Part> images,
-                                                 @Part("types[]") List<RequestBody> types,
                                                  @PartMap() Map<String, RequestBody> map
     );
 
@@ -230,36 +232,34 @@ public interface Service {
     @POST("api/addProduct")
     Call<StatusResponse> addAdsWithoutVideoWithoutList(@Header("Authorization") String user_token,
                                                        @Part("category_id") RequestBody category_id,
-                                                       @Part("sub_category_id") RequestBody sub_category_id,
+                                                       @Part("governorate_id") RequestBody governorate_id,
+                                                       @Part("type_id") RequestBody type_id,
                                                        @Part("title") RequestBody title,
                                                        @Part("price") RequestBody price,
-                                                       @Part("old_price") RequestBody old_price,
                                                        @Part("address") RequestBody address,
                                                        @Part("latitude") RequestBody latitude,
                                                        @Part("longitude") RequestBody longitude,
-                                                       @Part("have_offer") RequestBody have_offer,
-                                                       @Part("offer_value") RequestBody offer_value,
+                                                       @Part("desc") RequestBody desc,
                                                        @Part MultipartBody.Part main_image,
-                                                       @Part List<MultipartBody.Part> images,
-                                                       @Part("types[]") List<RequestBody> types);
+                                                       @Part List<MultipartBody.Part> images
+
+    );
 
 
     @Multipart
     @POST("api/addProduct")
     Call<StatusResponse> addAdsWithoutVideoWithList(@Header("Authorization") String user_token,
                                                     @Part("category_id") RequestBody category_id,
-                                                    @Part("sub_category_id") RequestBody sub_category_id,
+                                                    @Part("governorate_id") RequestBody governorate_id,
+                                                    @Part("type_id") RequestBody type_id,
                                                     @Part("title") RequestBody title,
                                                     @Part("price") RequestBody price,
-                                                    @Part("old_price") RequestBody old_price,
                                                     @Part("address") RequestBody address,
                                                     @Part("latitude") RequestBody latitude,
                                                     @Part("longitude") RequestBody longitude,
-                                                    @Part("have_offer") RequestBody have_offer,
-                                                    @Part("offer_value") RequestBody offer_value,
+                                                    @Part("desc") RequestBody desc,
                                                     @Part MultipartBody.Part main_image,
                                                     @Part List<MultipartBody.Part> images,
-                                                    @Part("types[]") List<RequestBody> types,
                                                     @PartMap() Map<String, RequestBody> map
 
     );
@@ -269,19 +269,18 @@ public interface Service {
     @POST("api/addProduct")
     Call<StatusResponse> addAdsWithVideoWithoutList(@Header("Authorization") String user_token,
                                                     @Part("category_id") RequestBody category_id,
-                                                    @Part("sub_category_id") RequestBody sub_category_id,
+                                                    @Part("governorate_id") RequestBody governorate_id,
+                                                    @Part("type_id") RequestBody type_id,
                                                     @Part("title") RequestBody title,
                                                     @Part("price") RequestBody price,
-                                                    @Part("old_price") RequestBody old_price,
                                                     @Part("address") RequestBody address,
                                                     @Part("latitude") RequestBody latitude,
                                                     @Part("longitude") RequestBody longitude,
-                                                    @Part("have_offer") RequestBody have_offer,
-                                                    @Part("offer_value") RequestBody offer_value,
+                                                    @Part("desc") RequestBody desc,
                                                     @Part MultipartBody.Part main_image,
                                                     @Part MultipartBody.Part vedio,
-                                                    @Part List<MultipartBody.Part> images,
-                                                    @Part("types[]") List<RequestBody> types
+                                                    @Part List<MultipartBody.Part> images
+
     );
 
     @FormUrlEncoded
@@ -392,10 +391,9 @@ public interface Service {
 
     );
 
-    @FormUrlEncoded
-    @POST("api/allChatRoomData")
+    @GET("api/allChatRoomData")
     Call<AdminMessageDataModel> getAdminChatMessage(@Header("Authorization") String user_token,
-                                                    @Field("room_id") int from_user_id);
+                                                    @Query("ad_id") int ad_id);
 
 
     @FormUrlEncoded
@@ -463,4 +461,6 @@ public interface Service {
                                             @Query(value = "key") String key
     );
 
+    @GET("api/all-governorates")
+    Call<GovernorateDataModel> getGovernorate();
 }

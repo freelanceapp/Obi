@@ -27,7 +27,7 @@ public class LoginModel extends BaseObservable {
     }
 
     public LoginModel() {
-        setPhone_code("+966");
+        setPhone_code("+20");
         setPhone("");
     }
 

@@ -14,9 +14,12 @@ import android.widget.Toast;
 
 import com.obiapp.R;
 import com.obiapp.activities_fragments.activity_chat.ChatActivity;
+import com.obiapp.activities_fragments.activity_chat_admin.ChatAdminActivity;
+import com.obiapp.activities_fragments.activity_product_details.ProductDetailsActivity;
 import com.obiapp.adapters.ProductAdapter2;
 import com.obiapp.databinding.ActivityProfileProductsBinding;
 import com.obiapp.language.Language;
+import com.obiapp.models.AdminMessageDataModel;
 import com.obiapp.models.ChatUserModel;
 import com.obiapp.models.MessageModel;
 import com.obiapp.models.OtherProfileDataModel;
@@ -92,7 +95,7 @@ public class ProfileProductsActivity extends AppCompatActivity {
             }
             binding.setModel(otherUserData);
         });
-        getData();
+        //getData();
     }
 
     private void getData() {
@@ -166,21 +169,21 @@ public class ProfileProductsActivity extends AppCompatActivity {
     }
 
     private void createChat() {
-        try {
+       /* try {
             ProgressDialog dialog = Common.createProgressDialog(this, getString(R.string.wait));
             dialog.setCancelable(false);
             dialog.setCanceledOnTouchOutside(false);
             dialog.show();
             Api.getService(Tags.base_url)
-                    .createRoom("Bearer " + userModel.getData().getToken(), userModel.getData().getId(), other_user_id)
-                    .enqueue(new Callback<RoomDataModel2>() {
+                    .getAdminChatMessage("Bearer " + userModel.getData().getToken(),productModel.getUser().getId())
+                    .enqueue(new Callback<AdminMessageDataModel>() {
                         @Override
-                        public void onResponse(Call<RoomDataModel2> call, Response<RoomDataModel2> response) {
+                        public void onResponse(Call<AdminMessageDataModel> call, Response<AdminMessageDataModel> response) {
                             dialog.dismiss();
                             if (response.isSuccessful()) {
 
                                 if (response.body() != null && response.body().getStatus() == 200) {
-                                    navigateToChatActivity(response.body().getData());
+                                    navigateToChatActivity(response.body().getData().getRoom());
                                 } else {
                                     Toast.makeText(ProfileProductsActivity.this, getString(R.string.failed), Toast.LENGTH_SHORT).show();
 
@@ -206,7 +209,7 @@ public class ProfileProductsActivity extends AppCompatActivity {
                         }
 
                         @Override
-                        public void onFailure(Call<RoomDataModel2> call, Throwable t) {
+                        public void onFailure(Call<AdminMessageDataModel> call, Throwable t) {
                             try {
                                 dialog.dismiss();
                                 if (t.getMessage() != null) {
@@ -224,14 +227,14 @@ public class ProfileProductsActivity extends AppCompatActivity {
                     });
         } catch (Exception e) {
 
-        }
+        }*/
     }
 
     private void navigateToChatActivity(MessageModel.RoomModel data) {
-        ChatUserModel chatUserModel = new ChatUserModel(otherUserData.getId(), otherUserData.getName(), otherUserData.getLogo(), data.getId());
-        Intent intent = new Intent(this, ChatActivity.class);
+       /* ChatUserModel chatUserModel = new ChatUserModel(data.getAdmin_id(), getString(R.string.admin),"", data.getId(),product_id);
+        Intent intent = new Intent(this, ChatAdminActivity.class);
         intent.putExtra("data", chatUserModel);
-        startActivity(intent);
+        startActivity(intent);*/
     }
 
     private void follow_un_follow(boolean status) {

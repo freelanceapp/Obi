@@ -16,12 +16,10 @@ import java.util.List;
 
 public class AddAdsModel extends BaseObservable implements Serializable {
     private int category_id;
-    private int sub_category_id;
+    private int governate_id;
+    private int type_id;
     private String name;
     private String price;
-    private String old_price;
-    private String have_offer;
-    private String offer_value;
     private String details;
     private String address;
     private double lat;
@@ -29,202 +27,115 @@ public class AddAdsModel extends BaseObservable implements Serializable {
     private boolean hasExtraItems;
     private boolean swear = false;
     private String video_url;
-    private List<Integer> types;
     private List<String> imagesList;
     private List<ItemAddAds> itemAddAdsList;
 
 
     public ObservableField<String> error_name = new ObservableField<>();
     public ObservableField<String> error_price = new ObservableField<>();
-    public ObservableField<String> error_old_price = new ObservableField<>();
-    public ObservableField<String> error_offer_value = new ObservableField<>();
     public ObservableField<String> error_details = new ObservableField<>();
     public ObservableField<String> error_address = new ObservableField<>();
 
 
-    public boolean isDataValid(Context context)
-    {
+    public boolean isDataValid(Context context) {
 
-        if (category_id!=0&&
-                sub_category_id!=0&&
+        if (category_id != 0 &&
+                governate_id != 0 &&
+                type_id != 0 &&
                 !name.isEmpty() &&
-                !old_price.isEmpty() &&
+                !price.isEmpty() &&
                 !details.isEmpty() &&
                 !address.isEmpty() &&
-                imagesList.size()>0&&
-                imagesList.size() <= 5&&
+                imagesList.size() > 0 &&
+                imagesList.size() <= 5 &&
                 swear
 
         ) {
 
             error_name.set(null);
-            error_old_price.set(null);
+            error_price.set(null);
             error_details.set(null);
             error_address.set(null);
-            if (hasExtraItems){
-                if (itemAddAdsList.size()>0){
+            if (hasExtraItems) {
+                if (itemAddAdsList.size() > 0) {
 
-                    if (isDataItemValid(context)){
-                        if (have_offer.equals("with_offer")){
-
-                            if (!price.isEmpty()&&!offer_value.isEmpty()&&Integer.parseInt(offer_value)>0){
-                                error_offer_value.set(null);
-                                error_price.set(null);
-                                return true;
-
-                            }else {
-
-                                if (price.isEmpty()){
-                                    error_price.set(context.getString(R.string.field_required));
-
-                                }else {
-                                    error_price.set(null);
-
-                                }
-
-                                if (offer_value.isEmpty()){
-                                    error_offer_value.set(context.getString(R.string.field_required));
-
-                                }else if (Integer.parseInt(offer_value)==0){
-                                    error_offer_value.set(context.getString(R.string.inv_value));
-                                }else {
-                                    error_offer_value.set(null);
-
-                                }
-
-
-                                return false;
-
-                            }
-                        }else {
-                            return true;
-
-                        }
-
-                    }else {
-                        return false;
-                    }
-                }else {
-                    return false;
-                }
-            }
-            else {
-
-                if (have_offer.equals("with_offer")){
-
-                    if (!price.isEmpty()&&!offer_value.isEmpty()){
-                        error_offer_value.set(null);
-                        error_price.set(null);
+                    if (isDataItemValid(context)) {
                         return true;
 
-                    }else {
 
-                        if (price.isEmpty()){
-                            error_price.set(context.getString(R.string.field_required));
-
-                        }else {
-                            error_price.set(null);
-
-                        }
-
-                        if (offer_value.isEmpty()){
-                            error_offer_value.set(context.getString(R.string.field_required));
-
-                        }else if (Integer.parseInt(offer_value)==0){
-                            error_offer_value.set(context.getString(R.string.inv_value));
-                        }else {
-                            error_offer_value.set(null);
-
-                        }
-
-
+                    } else {
                         return false;
-
                     }
-                }else {
-                    return true;
-
+                } else {
+                    return false;
                 }
+            } else {
+
+                return true;
 
 
             }
 
         } else {
 
-            if (name.isEmpty()){
+            if (name.isEmpty()) {
                 error_name.set(context.getString(R.string.field_required));
 
-            }else {
+            } else {
                 error_name.set(null);
 
             }
 
-            if (old_price.isEmpty()){
-                error_old_price.set(context.getString(R.string.field_required));
 
-            }else {
-                error_old_price.set(null);
-
-            }
-
-            if (details.isEmpty()){
+            if (details.isEmpty()) {
                 error_details.set(context.getString(R.string.field_required));
 
-            }else {
+            } else {
                 error_details.set(null);
 
             }
 
-            if (address.isEmpty()){
+            if (address.isEmpty()) {
                 error_address.set(context.getString(R.string.field_required));
 
-            }else {
+            } else {
                 error_address.set(null);
 
             }
 
-            if (imagesList.size()==0){
+            if (imagesList.size() == 0) {
                 Toast.makeText(context, R.string.ch_ad_image, Toast.LENGTH_SHORT).show();
             }
 
-            if (category_id==0){
+            if (category_id == 0) {
                 Toast.makeText(context, R.string.ch_dept, Toast.LENGTH_SHORT).show();
 
             }
 
-            if (sub_category_id==0){
-                Toast.makeText(context, R.string.ch_sub_dept, Toast.LENGTH_SHORT).show();
+            if (governate_id == 0) {
+                Toast.makeText(context, R.string.ch_governorate, Toast.LENGTH_SHORT).show();
 
             }
 
+            if (type_id == 0) {
+                Toast.makeText(context, R.string.ch_type, Toast.LENGTH_SHORT).show();
 
-            if (have_offer.equals("with_offer")){
-                if (price.isEmpty()){
-                    error_price.set(context.getString(R.string.field_required));
-
-                }else {
-                    error_price.set(null);
-
-                }
-
-                if (offer_value.isEmpty()){
-                    error_offer_value.set(context.getString(R.string.field_required));
-
-                }else if (Integer.parseInt(offer_value)==0){
-                    error_offer_value.set(context.getString(R.string.inv_value));
-                }else {
-                    error_offer_value.set(null);
-
-                }
             }
 
-            if (!swear){
+            if (!swear) {
                 Toast.makeText(context, R.string.accept_terms, Toast.LENGTH_SHORT).show();
             }
 
+            if (price.isEmpty()) {
+                error_price.set(context.getString(R.string.field_required));
 
-            if (hasExtraItems&&itemAddAdsList.size()>0){
-                if (isDataItemValid(context)){
+            } else {
+                error_price.set(null);
+
+            }
+
+            if (hasExtraItems && itemAddAdsList.size() > 0) {
+                if (isDataItemValid(context)) {
 
                 }
             }
@@ -236,22 +147,19 @@ public class AddAdsModel extends BaseObservable implements Serializable {
 
     public AddAdsModel() {
         category_id = 0;
-        sub_category_id = 0;
+        governate_id = 0;
+        type_id = 0;
         name = "";
         price = "";
-        old_price="";
         details = "";
         address = "";
         lat = 0.0;
         lng = 0.0;
         video_url = "";
-        offer_value="";
-        have_offer="without_offer";
         imagesList = new ArrayList<>();
         hasExtraItems = false;
         swear = false;
         itemAddAdsList = new ArrayList<>();
-        types = new ArrayList<>();
     }
 
 
@@ -263,37 +171,14 @@ public class AddAdsModel extends BaseObservable implements Serializable {
         this.category_id = category_id;
     }
 
-    public int getSub_category_id() {
-        return sub_category_id;
+    public int getGovernate_id() {
+        return governate_id;
     }
 
-    public void setSub_category_id(int sub_category_id) {
-        this.sub_category_id = sub_category_id;
+    public void setGovernate_id(int governate_id) {
+        this.governate_id = governate_id;
     }
 
-    public String getOld_price() {
-        return old_price;
-    }
-
-    public void setOld_price(String old_price) {
-        this.old_price = old_price;
-    }
-
-    public String getHave_offer() {
-        return have_offer;
-    }
-
-    public void setHave_offer(String have_offer) {
-        this.have_offer = have_offer;
-    }
-
-    public String getOffer_value() {
-        return offer_value;
-    }
-
-    public void setOffer_value(String offer_value) {
-        this.offer_value = offer_value;
-    }
 
     @Bindable
     public String getName() {
@@ -386,12 +271,12 @@ public class AddAdsModel extends BaseObservable implements Serializable {
         this.itemAddAdsList = itemAddAdsList;
     }
 
-    public boolean isDataItemValid(Context context){
+    public boolean isDataItemValid(Context context) {
         boolean valid = true;
 
 
-        for (ItemAddAds itemAddAds:itemAddAdsList){
-            if (itemAddAds.getValue_of_attribute().isEmpty()){
+        for (ItemAddAds itemAddAds : itemAddAdsList) {
+            if (itemAddAds.getValue_of_attribute().isEmpty()) {
                 valid = false;
             }
         }
@@ -408,11 +293,11 @@ public class AddAdsModel extends BaseObservable implements Serializable {
         this.swear = swear;
     }
 
-    public List<Integer> getTypes() {
-        return types;
+    public int getType_id() {
+        return type_id;
     }
 
-    public void setTypes(List<Integer> types) {
-        this.types = types;
+    public void setType_id(int type_id) {
+        this.type_id = type_id;
     }
 }

@@ -184,14 +184,14 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
             if (messageModel.getMessage_kind().equals("text")){
 
-                if (messageModel.getFrom_user().getId()==current_user_id){
+                if (messageModel.getFrom_user_id()==current_user_id){
 
                     return msg_right;
                 }else {
                     return msg_left;
                 }
             }else {
-                if (messageModel.getFrom_user().getId()==current_user_id){
+                if (messageModel.getFrom_user_id()==current_user_id){
 
                     return img_right;
                 }else {

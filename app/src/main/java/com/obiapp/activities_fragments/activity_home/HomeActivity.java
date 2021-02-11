@@ -48,6 +48,7 @@ import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.obiapp.R;
+import com.obiapp.activities_fragments.activity_add_ads.AddAdsActivity;
 import com.obiapp.activities_fragments.activity_department_details.DepartmentDetailsActivity;
 import com.obiapp.activities_fragments.activity_home.fragments.Fragment_News;
 import com.obiapp.activities_fragments.activity_home.fragments.Fragment_Home;
@@ -155,6 +156,15 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
             Intent intent = new Intent(HomeActivity.this, NotificationActivity.class);
             startActivity(intent);
 
+        });
+
+        binding.fab.setOnClickListener(v -> {
+            if (userModel != null) {
+                Intent intent = new Intent(this, AddAdsActivity.class);
+                startActivity(intent);
+            }else {
+                Toast.makeText(this,getString(R.string.please_sign_in_or_sign_up), Toast.LENGTH_SHORT).show();
+            }
         });
         binding.setModel(userModel);
 

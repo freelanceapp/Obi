@@ -14,11 +14,10 @@ public class MessageModel implements Serializable {
     private long date;
     private String is_read;
     private RoomModel room;
-    private UserModel.Data from_user;
-    private UserModel.Data to_user;
 
 
-    public MessageModel(int id, int chat_room_id, int from_user_id, int to_user_id, String message_kind, String message, String file_link, long date, RoomModel room, UserModel.Data from_user, UserModel.Data to_user) {
+
+    public MessageModel(int id, int chat_room_id, int from_user_id, int to_user_id, String message_kind, String message, String file_link, long date, RoomModel room) {
         this.id = id;
         this.chat_room_id = chat_room_id;
         this.from_user_id = from_user_id;
@@ -28,8 +27,7 @@ public class MessageModel implements Serializable {
         this.file_link = file_link;
         this.date = date;
         this.room = room;
-        this.from_user = from_user;
-        this.to_user = to_user;
+
     }
 
     public int getId() {
@@ -72,47 +70,55 @@ public class MessageModel implements Serializable {
         return room;
     }
 
-    public UserModel.Data getFrom_user() {
-        return from_user;
-    }
 
-    public UserModel.Data getTo_user() {
-        return to_user;
-    }
 
     public static class RoomModel implements Serializable{
         private int id;
-        private int first_user_id;
-        private int second_user_id;
+        private int user_id;
+        private int admin_id;
         public String is_approved;
 
 
         public RoomModel() {
         }
 
-        public RoomModel(int id, int first_user_id, int second_user_id) {
+        public RoomModel(int id, int user_id, int admin_id) {
             this.id = id;
-            this.first_user_id = first_user_id;
-            this.second_user_id = second_user_id;
+            this.user_id = user_id;
+            this.admin_id = admin_id;
         }
 
         public int getId() {
             return id;
         }
 
-        public int getFirst_user_id() {
-            return first_user_id;
+        public void setId(int id) {
+            this.id = id;
         }
 
-        public int getSecond_user_id() {
-            return second_user_id;
+        public int getUser_id() {
+            return user_id;
+        }
+
+        public void setUser_id(int user_id) {
+            this.user_id = user_id;
+        }
+
+        public int getAdmin_id() {
+            return admin_id;
+        }
+
+        public void setAdmin_id(int admin_id) {
+            this.admin_id = admin_id;
         }
 
         public String getIs_approved() {
             return is_approved;
         }
 
-
+        public void setIs_approved(String is_approved) {
+            this.is_approved = is_approved;
+        }
     }
 
 }

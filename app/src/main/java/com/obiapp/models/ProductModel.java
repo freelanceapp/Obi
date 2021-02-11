@@ -35,6 +35,7 @@ public class ProductModel implements Serializable {
    private SubCategory sub_category;
    private List<ProductImageModel> product_images;
    private List<ProductDetail> product_details;
+   private GovernorateModel governorate;
    private ProductType product_type;
 
     public int getId() {
@@ -127,6 +128,10 @@ public class ProductModel implements Serializable {
 
     public int getTime_in_days_from_creating() {
         return time_in_days_from_creating;
+    }
+
+    public GovernorateModel getGovernorate() {
+        return governorate;
     }
 
     public UserModel.Data getUser() {
@@ -306,6 +311,8 @@ public class ProductModel implements Serializable {
         public String getUpdated_at() {
             return updated_at;
         }
+
+
     }
 
     public static class Type implements Serializable
@@ -365,6 +372,8 @@ public class ProductModel implements Serializable {
             return type;
         }
     }
+
+
 
 
 }

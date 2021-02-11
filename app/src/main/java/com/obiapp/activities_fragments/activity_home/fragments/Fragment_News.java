@@ -171,10 +171,10 @@ public class Fragment_News extends Fragment {
             chat_user_id = roomModel.getFirst_user_id();
 
         }
-        ChatUserModel chatUserModel = new ChatUserModel(chat_user_id, roomModel.getOther_user_name(), roomModel.getOther_user_logo(), roomModel.getId());
+        /*ChatUserModel chatUserModel = new ChatUserModel(chat_user_id, roomModel.getOther_user_name(), roomModel.getOther_user_logo(), roomModel.getId());
         Intent intent = new Intent(activity, ChatActivity.class);
         intent.putExtra("data", chatUserModel);
-        startActivityForResult(intent, 100);
+        startActivityForResult(intent, 100);*/
 
     }
 
