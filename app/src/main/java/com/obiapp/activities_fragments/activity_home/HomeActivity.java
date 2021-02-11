@@ -523,6 +523,7 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
 
     private void updateHomUi() {
         binding.flsearch.setVisibility(View.VISIBLE);
+        binding.tv.setVisibility(View.GONE);
         binding.flcountrguide.setBackgroundResource(0);
         binding.iconcountrguide.setColorFilter(ContextCompat.getColor(this, R.color.
                 gray6));
@@ -553,6 +554,7 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
 
     private void updateCountryGuideUi() {
         binding.flsearch.setVisibility(View.GONE);
+        binding.tv.setVisibility(View.VISIBLE);
 
         binding.iconcountrguide.setColorFilter(ContextCompat.getColor(this, R.color.
                 colorPrimary));
@@ -586,6 +588,7 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
 
     private void updateProfileUi() {
         binding.flsearch.setVisibility(View.GONE);
+        binding.tv.setVisibility(View.VISIBLE);
 
         binding.flHome.setBackgroundResource(0);
         binding.iconHome.setColorFilter(ContextCompat.getColor(this, R.color.
@@ -619,6 +622,7 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
 
     private void updateNewsUi() {
         binding.flsearch.setVisibility(View.GONE);
+        binding.tv.setVisibility(View.VISIBLE);
 
         binding.flHome.setBackgroundResource(0);
         binding.iconHome.setColorFilter(ContextCompat.getColor(this, R.color.
