@@ -41,7 +41,9 @@
             android:id="@+id/drawerLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:openDrawer="start">
+             android:background="@color/white"
+
+             tools:openDrawer="start">
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardview"
