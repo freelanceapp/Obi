@@ -107,6 +107,7 @@ public class Fragment_Offer extends Fragment {
 
 
         categoryModelList.clear();
+        categoryAdapter.notifyDataSetChanged();
         Api.getService(Tags.base_url)
                 .getGoogleCategory()
                 .enqueue(new Callback<CategoryDataModel>() {
