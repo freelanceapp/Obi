@@ -2,6 +2,7 @@ package com.obiapp.activities_fragments.activity_home.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -40,6 +41,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import io.paperdb.Paper;
 import retrofit2.Call;
@@ -63,7 +66,7 @@ public class Fragment_Home extends Fragment {
     private Category_Adapter categoryAdapter;
     private String id;
     private String query=null;
-
+    private int current_page = 0, NUM_PAGES;
     public static Fragment_Home newInstance() {
         return new Fragment_Home();
     }
@@ -73,7 +76,26 @@ public class Fragment_Home extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false);
         initView();
+        change_slide_image();
         return binding.getRoot();
+    }
+    private void change_slide_image() {
+        final Handler handler = new Handler();
+        final Runnable Update = new Runnable() {
+            public void run() {
+                if (current_page == NUM_PAGES) {
+                    current_page = 0;
+                }
+                binding.pager.setCurrentItem(current_page++, true);
+            }
+        };
+        Timer swipeTimer = new Timer();
+        swipeTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                handler.post(Update);
+            }
+        }, 3000, 3000);
     }
 
     @Override
@@ -257,11 +279,13 @@ public class Fragment_Home extends Fragment {
                     if (response.isSuccessful() && response.body() != null) {
                         if (response.body().getStatus() == 200) {
                             if (response.body().getData().size() > 0) {
+                                binding.llnew.setVisibility(View.VISIBLE);
                                 productModelList.clear();
                                 productModelList.addAll(response.body().getData());
                                 productAdapter.notifyDataSetChanged();
                                 binding.tvNoData.setVisibility(View.GONE);
                             } else {
+                                binding.llnew.setVisibility(View.GONE);
                                 binding.tvNoData.setVisibility(View.VISIBLE);
 
                             }

@@ -236,7 +236,7 @@
                             android:layout_weight="1" />
 
                         <TextView
-                            android:id="@+id/tvChat"
+                            android:id="@+id/tvNews"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical"

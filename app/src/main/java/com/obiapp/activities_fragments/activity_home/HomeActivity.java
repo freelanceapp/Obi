@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
+import android.os.Build;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,7 +16,10 @@ import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.TranslateAnimation;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -24,6 +28,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -44,7 +49,7 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.obiapp.R;
 import com.obiapp.activities_fragments.activity_department_details.DepartmentDetailsActivity;
-import com.obiapp.activities_fragments.activity_home.fragments.Fragment_Chat;
+import com.obiapp.activities_fragments.activity_home.fragments.Fragment_News;
 import com.obiapp.activities_fragments.activity_home.fragments.Fragment_Home;
 import com.obiapp.activities_fragments.activity_home.fragments.Fragment_Offer;
 import com.obiapp.activities_fragments.activity_home.fragments.Fragment_Profile;
@@ -83,14 +88,15 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
     private FragmentManager fragmentManager;
     private Fragment_Home fragment_home;
     private Fragment_Profile fragment_profile;
-    private Fragment_Chat fragment_chat;
-    private Fragment_Offer fragment_offer;
+    private Fragment_News fragment_news;
+    private Fragment_Offer fragment_country_guide;
     private UserModel userModel;
     private String lang;
     private ActionBarDrawerToggle toggle;
     private List<DepartmentModel> departmentModelList;
     private ExpandDepartmentAdapter expandDepartmentAdapter;
     private int parent_pos = -1, child_pos = -1;
+    private float lastTranslate = 0.0f;
     private GoogleApiClient googleApiClient;
     private LocationRequest locationRequest;
     private LocationCallback locationCallback;
@@ -109,6 +115,8 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home);
+        CheckPermission();
+
         initView();
 
 
@@ -119,16 +127,27 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
         fragmentManager = getSupportFragmentManager();
         preferences = Preferences.getInstance();
         userModel = preferences.getUserData(this);
+//        if(userModel==null){
+//            binding.llprofile.setVisibility(View.GONE);
+//        }
         Paper.init(this);
         lang = Paper.book().read("lang", "ar");
         binding.setLang(lang);
-        toggle = new ActionBarDrawerToggle(this, binding.drawerLayout, binding.toolbar, R.string.open, R.string.close);
-//        toggle.setDisplayHomeAsUpEnabled(true);
-//        toggle.setDisplayShowHomeEnabled(true);
+        toggle = new ActionBarDrawerToggle(this, binding.drawerLayout, binding.toolbar, R.string.open, R.string.close) {
+            @SuppressLint("NewApi")
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+                slide(slideOffset);
+
+            }
+        };
+        //   toggle.setDrawerIndicatorEnabled(false);
 
         toggle.syncState();
+        binding.toolbar.setNavigationIcon(R.drawable.ic_menu);
 
-        binding.toolbar.setNavigationIcon(R.drawable.ic_squares);
+        binding.drawerLayout.setDrawerListener(toggle);
+
+        binding.toolbar.setNavigationIcon(R.drawable.ic_menu);
 
         binding.toolbar.getNavigationIcon().setColorFilter(ContextCompat.getColor(this, R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
         binding.flNotification.setOnClickListener(view -> {
@@ -140,9 +159,10 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
         binding.setModel(userModel);
 
 
-        binding.recViewNavigation.setLayoutManager(new LinearLayoutManager(this));
-        expandDepartmentAdapter = new ExpandDepartmentAdapter(departmentModelList, this);
-        binding.recViewNavigation.setAdapter(expandDepartmentAdapter);
+//
+//        binding.recViewNavigation.setLayoutManager(new LinearLayoutManager(this));
+//        expandDepartmentAdapter = new ExpandDepartmentAdapter(departmentModelList, this);
+//        binding.recViewNavigation.setAdapter(expandDepartmentAdapter);
 
         binding.flHome.setOnClickListener(v -> {
             displayFragmentMain();
@@ -154,8 +174,8 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
 
         });
 
-        binding.flChat.setOnClickListener(v -> {
-            displayFragmentChat();
+        binding.flNews.setOnClickListener(v -> {
+            displayFragmentNews();
 
         });
         binding.edtSearch.addTextChangedListener(new TextWatcher() {
@@ -178,12 +198,12 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
 
             }
         });
-        binding.llCoupon.setOnClickListener(view -> {
-            Intent intent = new Intent(this, MyCouponsActivity.class);
-            startActivity(intent);
-        });
-        binding.flOffer.setOnClickListener(v -> {
-            displayFragmentOffer();
+//        binding.llCoupon.setOnClickListener(view -> {
+//            Intent intent = new Intent(this, MyCouponsActivity.class);
+//            startActivity(intent);
+//        });
+        binding.flcountrguide.setOnClickListener(v -> {
+            displayFragmentCountryGuide();
 
         });
 
@@ -195,84 +215,173 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
 
         }
 
-        binding.swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
-        binding.swipeRefresh.setOnRefreshListener(this::getDepartments);
-        CheckPermission();
-        getDepartments();
 
+//        binding.swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
+//        binding.swipeRefresh.setOnRefreshListener(this::getDepartments);
+        //  getDepartments();
+        binding.llabout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                binding.drawerLayout.closeDrawer(Gravity.RIGHT);
+                binding.tv1.setTextColor(getResources().getColor(R.color.gray6));
+                //  binding.tv2.setTextColor(getResources().getColor(R.color. gray6));
+                binding.tv3.setTextColor(getResources().getColor(R.color.gray6));
+                binding.tv4.setTextColor(getResources().getColor(R.color.colorAccent));
+                binding.tv5.setTextColor(getResources().getColor(R.color.gray6));
+                binding.image1.setColorFilter(R.color.gray6, android.graphics.PorterDuff.Mode.MULTIPLY);
+                //  binding.image2.setColorFilter(R.color. gray6, android.graphics.PorterDuff.Mode.MULTIPLY);
+                binding.image3.setColorFilter(R.color.gray6, android.graphics.PorterDuff.Mode.MULTIPLY);
+                binding.image4.setColorFilter(R.color.colorAccent, android.graphics.PorterDuff.Mode.MULTIPLY);
+                binding.image5.setColorFilter(R.color.gray6, android.graphics.PorterDuff.Mode.MULTIPLY);
+                //  presenter.displayFragmentAboutus();
+//        binding.swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
+//        binding.swipeRefresh.setOnRefreshListener(this::getDepartments);
+      //  getDepartments();
+
+            }
+        });
+        binding.llterms.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //  binding.drawar.closeDrawer(Gravity.RIGHT);
+                binding.drawerLayout.closeDrawer(Gravity.RIGHT);
+                binding.tv1.setTextColor(getResources().getColor(R.color.gray6));
+                //binding.tv2.setTextColor(getResources().getColor(R.color. gray6));
+                binding.tv3.setTextColor(getResources().getColor(R.color.gray6));
+                binding.tv4.setTextColor(getResources().getColor(R.color.gray6));
+                binding.tv5.setTextColor(getResources().getColor(R.color.colorAccent));
+                binding.image1.setColorFilter(R.color.gray6, android.graphics.PorterDuff.Mode.MULTIPLY);
+                //binding.image2.setColorFilter(R.color. gray6, android.graphics.PorterDuff.Mode.MULTIPLY);
+                binding.image3.setColorFilter(R.color.gray6, android.graphics.PorterDuff.Mode.MULTIPLY);
+                binding.image4.setColorFilter(R.color.gray6, android.graphics.PorterDuff.Mode.MULTIPLY);
+                binding.image5.setColorFilter(R.color.colorAccent, android.graphics.PorterDuff.Mode.MULTIPLY);
+                //  presenter.displayFragmentTerms();
+            }
+        });
+        binding.llcontactus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                binding.drawerLayout.closeDrawer(Gravity.RIGHT);
+                binding.tv1.setTextColor(getResources().getColor(R.color.gray6));
+                //binding.tv2.setTextColor(getResources().getColor(R.color. gray6));
+                binding.tv3.setTextColor(getResources().getColor(R.color.colorAccent));
+                binding.tv4.setTextColor(getResources().getColor(R.color.gray6));
+                binding.tv5.setTextColor(getResources().getColor(R.color.gray6));
+                binding.image1.setColorFilter(R.color.gray6, android.graphics.PorterDuff.Mode.MULTIPLY);
+                // binding.image2.setColorFilter(R.color. gray6, android.graphics.PorterDuff.Mode.MULTIPLY);
+                binding.image3.setColorFilter(R.color.colorAccent, android.graphics.PorterDuff.Mode.MULTIPLY);
+                binding.image4.setColorFilter(R.color.gray6, android.graphics.PorterDuff.Mode.MULTIPLY);
+                binding.image5.setColorFilter(R.color.gray6, android.graphics.PorterDuff.Mode.MULTIPLY);
+
+                // presenter.displayFragmentContactus();
+
+            }
+        });
+        binding.llhome.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                binding.drawerLayout.closeDrawer(Gravity.RIGHT);
+                binding.tv1.setTextColor(getResources().getColor(R.color.colorAccent));
+                binding.tv3.setTextColor(getResources().getColor(R.color.gray6));
+                binding.tv4.setTextColor(getResources().getColor(R.color.gray6));
+                binding.tv5.setTextColor(getResources().getColor(R.color.gray6));
+                binding.image1.setColorFilter(R.color.colorAccent, android.graphics.PorterDuff.Mode.MULTIPLY);
+                binding.image3.setColorFilter(R.color.gray6, android.graphics.PorterDuff.Mode.MULTIPLY);
+                binding.image4.setColorFilter(R.color.gray6, android.graphics.PorterDuff.Mode.MULTIPLY);
+                binding.image5.setColorFilter(R.color.gray6, android.graphics.PorterDuff.Mode.MULTIPLY);
+
+            }
+        });
+
+        binding.lllogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (userModel != null) {
+                    preferences.clear(HomeActivity.this);
+                    Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    Toast.makeText(HomeActivity.this, getResources().getString(R.string.please_sign_in_or_sign_up), Toast.LENGTH_LONG).show();
+
+                }
+
+            }
+
+        });
     }
 
 
-    private void getDepartments() {
-        try {
-
-            Api.getService(Tags.base_url)
-                    .getDepartment()
-                    .enqueue(new Callback<DepartmentDataModel>() {
-                        @Override
-                        public void onResponse(Call<DepartmentDataModel> call, Response<DepartmentDataModel> response) {
-                            binding.progBarNavigation.setVisibility(View.GONE);
-                            binding.swipeRefresh.setRefreshing(false);
-                            if (response.isSuccessful() && response.body() != null) {
-                                if (response.body().getStatus() == 200) {
-                                    if (response.body().getData().size() > 0) {
-                                        departmentModelList.clear();
-                                        departmentModelList.addAll(response.body().getData());
-                                        expandDepartmentAdapter.notifyDataSetChanged();
-                                        binding.tvNoDataNavigation.setVisibility(View.GONE);
-                                    } else {
-                                        binding.tvNoDataNavigation.setVisibility(View.VISIBLE);
-
-                                    }
-                                } else {
-                                    Toast.makeText(HomeActivity.this, getString(R.string.failed), Toast.LENGTH_SHORT).show();
-                                }
-                            } else {
-                                binding.swipeRefresh.setRefreshing(false);
-
-                                binding.progBarNavigation.setVisibility(View.GONE);
-
-                                if (response.code() == 500) {
-                                    Toast.makeText(HomeActivity.this, "Server Error", Toast.LENGTH_SHORT).show();
-
-
-                                } else {
-                                    Toast.makeText(HomeActivity.this, getString(R.string.failed), Toast.LENGTH_SHORT).show();
-
-                                    try {
-
-                                        Log.e("error", response.code() + "_" + response.errorBody().string());
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Call<DepartmentDataModel> call, Throwable t) {
-                            try {
-                                binding.swipeRefresh.setRefreshing(false);
-
-                                binding.progBarNavigation.setVisibility(View.GONE);
-
-                                if (t.getMessage() != null) {
-                                    Log.e("error", t.getMessage());
-                                    if (t.getMessage().toLowerCase().contains("failed to connect") || t.getMessage().toLowerCase().contains("unable to resolve host")) {
-                                        Toast.makeText(HomeActivity.this, R.string.something, Toast.LENGTH_SHORT).show();
-                                    } else {
-                                        Toast.makeText(HomeActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-
-                            } catch (Exception e) {
-                            }
-                        }
-                    });
-        } catch (Exception e) {
-
-        }
-    }
+//    private void getDepartments() {
+//        try {
+//
+//            Api.getService(Tags.base_url)
+//                    .getDepartment()
+//                    .enqueue(new Callback<DepartmentDataModel>() {
+//                        @Override
+//                        public void onResponse(Call<DepartmentDataModel> call, Response<DepartmentDataModel> response) {
+//                            binding.progBarNavigation.setVisibility(View.GONE);
+//                            binding.swipeRefresh.setRefreshing(false);
+//                            if (response.isSuccessful() && response.body() != null) {
+//                                if (response.body().getStatus() == 200) {
+//                                    if (response.body().getData().size() > 0) {
+//                                        departmentModelList.clear();
+//                                        departmentModelList.addAll(response.body().getData());
+//                                        expandDepartmentAdapter.notifyDataSetChanged();
+//                                        binding.tvNoDataNavigation.setVisibility(View.GONE);
+//                                    } else {
+//                                        binding.tvNoDataNavigation.setVisibility(View.VISIBLE);
+//
+//                                    }
+//                                } else {
+//                                    Toast.makeText(HomeActivity.this, getString(R.string.failed), Toast.LENGTH_SHORT).show();
+//                                }
+//                            } else {
+//                                binding.swipeRefresh.setRefreshing(false);
+//
+//                                binding.progBarNavigation.setVisibility(View.GONE);
+//
+//                                if (response.code() == 500) {
+//                                    Toast.makeText(HomeActivity.this, "Server Error", Toast.LENGTH_SHORT).show();
+//
+//
+//                                } else {
+//                                    Toast.makeText(HomeActivity.this, getString(R.string.failed), Toast.LENGTH_SHORT).show();
+//
+//                                    try {
+//
+//                                        Log.e("error", response.code() + "_" + response.errorBody().string());
+//                                    } catch (IOException e) {
+//                                        e.printStackTrace();
+//                                    }
+//                                }
+//                            }
+//                        }
+//
+//                        @Override
+//                        public void onFailure(Call<DepartmentDataModel> call, Throwable t) {
+//                            try {
+//                                binding.swipeRefresh.setRefreshing(false);
+//
+//                                binding.progBarNavigation.setVisibility(View.GONE);
+//
+//                                if (t.getMessage() != null) {
+//                                    Log.e("error", t.getMessage());
+//                                    if (t.getMessage().toLowerCase().contains("failed to connect") || t.getMessage().toLowerCase().contains("unable to resolve host")) {
+//                                        Toast.makeText(HomeActivity.this, R.string.something, Toast.LENGTH_SHORT).show();
+//                                    } else {
+//                                        Toast.makeText(HomeActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+//                                    }
+//                                }
+//
+//                            } catch (Exception e) {
+//                            }
+//                        }
+//                    });
+//        } catch (Exception e) {
+//
+//        }
+//    }
 
 
     private void readNotificationCount() {
@@ -288,15 +397,15 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
             }
 
 
-            if (fragment_offer != null && fragment_offer.isAdded()) {
-                fragmentManager.beginTransaction().hide(fragment_offer).commit();
+            if (fragment_country_guide != null && fragment_country_guide.isAdded()) {
+                fragmentManager.beginTransaction().hide(fragment_country_guide).commit();
             }
             if (fragment_profile != null && fragment_profile.isAdded()) {
                 fragmentManager.beginTransaction().hide(fragment_profile).commit();
             }
 
-            if (fragment_chat != null && fragment_chat.isAdded()) {
-                fragmentManager.beginTransaction().hide(fragment_chat).commit();
+            if (fragment_news != null && fragment_news.isAdded()) {
+                fragmentManager.beginTransaction().hide(fragment_news).commit();
             }
             if (fragment_home.isAdded()) {
                 fragmentManager.beginTransaction().show(fragment_home).commit();
@@ -311,21 +420,21 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
 
     }
 
-    public void displayFragmentOffer() {
+    public void displayFragmentCountryGuide() {
 
         try {
 
-            updateOfferUi();
-            if (fragment_offer == null) {
-                fragment_offer = Fragment_Offer.newInstance();
+            updateCountryGuideUi();
+            if (fragment_country_guide == null) {
+                fragment_country_guide = Fragment_Offer.newInstance();
             }
 
 
             if (fragment_home != null && fragment_home.isAdded()) {
                 fragmentManager.beginTransaction().hide(fragment_home).commit();
             }
-            if (fragment_chat != null && fragment_chat.isAdded()) {
-                fragmentManager.beginTransaction().hide(fragment_chat).commit();
+            if (fragment_news != null && fragment_news.isAdded()) {
+                fragmentManager.beginTransaction().hide(fragment_news).commit();
             }
 
             if (fragment_profile != null && fragment_profile.isAdded()) {
@@ -333,11 +442,11 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
             }
 
 
-            if (fragment_offer.isAdded()) {
-                fragmentManager.beginTransaction().show(fragment_offer).commit();
+            if (fragment_country_guide.isAdded()) {
+                fragmentManager.beginTransaction().show(fragment_country_guide).commit();
 
             } else {
-                fragmentManager.beginTransaction().add(R.id.fragment_app_container, fragment_offer, "fragment_offer").commit();
+                fragmentManager.beginTransaction().add(R.id.fragment_app_container, fragment_country_guide, "fragment_offer").commit();
 
             }
             binding.setTitle(getString(R.string.offers));
@@ -357,12 +466,12 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
             if (fragment_home != null && fragment_home.isAdded()) {
                 fragmentManager.beginTransaction().hide(fragment_home).commit();
             }
-            if (fragment_offer != null && fragment_offer.isAdded()) {
-                fragmentManager.beginTransaction().hide(fragment_offer).commit();
+            if (fragment_country_guide != null && fragment_country_guide.isAdded()) {
+                fragmentManager.beginTransaction().hide(fragment_country_guide).commit();
             }
 
-            if (fragment_chat != null && fragment_chat.isAdded()) {
-                fragmentManager.beginTransaction().hide(fragment_chat).commit();
+            if (fragment_news != null && fragment_news.isAdded()) {
+                fragmentManager.beginTransaction().hide(fragment_news).commit();
             }
 
 
@@ -378,20 +487,20 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
         }
     }
 
-    public void displayFragmentChat() {
+    public void displayFragmentNews() {
 
         try {
-            updateChatUi();
-            if (fragment_chat == null) {
-                fragment_chat = Fragment_Chat.newInstance();
+            updateNewsUi();
+            if (fragment_news == null) {
+                fragment_news = Fragment_News.newInstance();
             }
 
 
             if (fragment_home != null && fragment_home.isAdded()) {
                 fragmentManager.beginTransaction().hide(fragment_home).commit();
             }
-            if (fragment_offer != null && fragment_offer.isAdded()) {
-                fragmentManager.beginTransaction().hide(fragment_offer).commit();
+            if (fragment_country_guide != null && fragment_country_guide.isAdded()) {
+                fragmentManager.beginTransaction().hide(fragment_country_guide).commit();
             }
 
             if (fragment_profile != null && fragment_profile.isAdded()) {
@@ -399,11 +508,11 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
             }
 
 
-            if (fragment_chat.isAdded()) {
-                fragmentManager.beginTransaction().show(fragment_chat).commit();
+            if (fragment_news.isAdded()) {
+                fragmentManager.beginTransaction().show(fragment_news).commit();
 
             } else {
-                fragmentManager.beginTransaction().add(R.id.fragment_app_container, fragment_chat, "fragment_profile").addToBackStack("fragment_profile").commit();
+                fragmentManager.beginTransaction().add(R.id.fragment_app_container, fragment_news, "fragment_profile").addToBackStack("fragment_profile").commit();
 
             }
             binding.setTitle(getString(R.string.chats));
@@ -413,104 +522,132 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
 
 
     private void updateHomUi() {
+        binding.flsearch.setVisibility(View.VISIBLE);
+        binding.flcountrguide.setBackgroundResource(0);
+        binding.iconcountrguide.setColorFilter(ContextCompat.getColor(this, R.color.
+                gray6));
+        binding.tvcountrguide.setTextColor(ContextCompat.getColor(this, R.color.
+                gray6));
+        // binding.tvOffer.setVisibility(View.GONE);
 
-        binding.flOffer.setBackgroundResource(0);
-        binding.iconOffer.setColorFilter(ContextCompat.getColor(this, R.color.black));
-        binding.tvOffer.setTextColor(ContextCompat.getColor(this, R.color.black));
-        binding.tvOffer.setVisibility(View.GONE);
-
-        binding.flHome.setBackgroundResource(R.drawable.small_rounded_btn_primary);
-        binding.iconHome.setColorFilter(ContextCompat.getColor(this, R.color.white));
-        binding.tvHome.setTextColor(ContextCompat.getColor(this, R.color.white));
+        binding.iconHome.setColorFilter(ContextCompat.getColor(this, R.color.colorPrimary));
+        binding.tvHome.setTextColor(ContextCompat.getColor(this, R.color.
+                colorPrimary));
         binding.tvHome.setVisibility(View.VISIBLE);
 
         binding.flProfile.setBackgroundResource(0);
-        binding.iconProfile.setColorFilter(ContextCompat.getColor(this, R.color.black));
-        binding.tvProfile.setTextColor(ContextCompat.getColor(this, R.color.black));
-        binding.tvProfile.setVisibility(View.GONE);
+        binding.iconProfile.setColorFilter(ContextCompat.getColor(this, R.color.
+                gray6));
+        binding.tvProfile.setTextColor(ContextCompat.getColor(this, R.color.
+                gray6));
+        //  binding.tvProfile.setVisibility(View.GONE);
 
-        binding.flChat.setBackgroundResource(0);
-        binding.iconChat.setColorFilter(ContextCompat.getColor(this, R.color.black));
-        binding.tvChat.setTextColor(ContextCompat.getColor(this, R.color.black));
-        binding.tvChat.setVisibility(View.GONE);
+        binding.flNews.setBackgroundResource(0);
+        binding.iconNews.setColorFilter(ContextCompat.getColor(this, R.color.gray6));
+        binding.tvNews.setTextColor(ContextCompat.getColor(this, R.color.
+                gray6));
+        // binding.tvNews.setVisibility(View.GONE);
 
 
     }
 
-    private void updateOfferUi() {
+    private void updateCountryGuideUi() {
+        binding.flsearch.setVisibility(View.GONE);
 
-        binding.flOffer.setBackgroundResource(R.drawable.small_rounded_btn_primary);
-        binding.iconOffer.setColorFilter(ContextCompat.getColor(this, R.color.white));
-        binding.tvOffer.setTextColor(ContextCompat.getColor(this, R.color.white));
-        binding.tvOffer.setVisibility(View.VISIBLE);
+        binding.iconcountrguide.setColorFilter(ContextCompat.getColor(this, R.color.
+                colorPrimary));
+        binding.tvcountrguide.setTextColor(ContextCompat.getColor(this, R.color.
+                colorPrimary));
+        //binding.tvOffer.setVisibility(View.VISIBLE);
 
         binding.flHome.setBackgroundResource(0);
-        binding.iconHome.setColorFilter(ContextCompat.getColor(this, R.color.black));
-        binding.tvHome.setTextColor(ContextCompat.getColor(this, R.color.black));
-        binding.tvHome.setVisibility(View.GONE);
+        binding.iconHome.setColorFilter(ContextCompat.getColor(this, R.color.
+                gray6));
+        binding.tvHome.setTextColor(ContextCompat.getColor(this, R.color.
+                gray6));
+        //  binding.tvHome.setVisibility(View.GONE);
 
 
         binding.flProfile.setBackgroundResource(0);
-        binding.iconProfile.setColorFilter(ContextCompat.getColor(this, R.color.black));
-        binding.tvProfile.setTextColor(ContextCompat.getColor(this, R.color.black));
-        binding.tvProfile.setVisibility(View.GONE);
+        binding.iconProfile.setColorFilter(ContextCompat.getColor(this, R.color.
+                gray6));
+        binding.tvProfile.setTextColor(ContextCompat.getColor(this, R.color.
+                gray6));
+        // binding.tvProfile.setVisibility(View.GONE);
 
-        binding.flChat.setBackgroundResource(0);
-        binding.iconChat.setColorFilter(ContextCompat.getColor(this, R.color.black));
-        binding.tvChat.setTextColor(ContextCompat.getColor(this, R.color.black));
-        binding.tvChat.setVisibility(View.GONE);
+        binding.flNews.setBackgroundResource(0);
+        binding.iconNews.setColorFilter(ContextCompat.getColor(this, R.color.
+                gray6));
+        binding.tvNews.setTextColor(ContextCompat.getColor(this, R.color.gray6));
+        //  binding.       tvNews.setVisibility(View.GONE);
 
     }
 
 
     private void updateProfileUi() {
+        binding.flsearch.setVisibility(View.GONE);
 
         binding.flHome.setBackgroundResource(0);
-        binding.iconHome.setColorFilter(ContextCompat.getColor(this, R.color.black));
-        binding.tvHome.setTextColor(ContextCompat.getColor(this, R.color.black));
-        binding.tvHome.setVisibility(View.GONE);
+        binding.iconHome.setColorFilter(ContextCompat.getColor(this, R.color.
+                gray6));
+        binding.tvHome.setTextColor(ContextCompat.getColor(this, R.color.
+                gray6));
+        // binding.tvHome.setVisibility(View.GONE);
 
 
-        binding.flOffer.setBackgroundResource(0);
-        binding.iconOffer.setColorFilter(ContextCompat.getColor(this, R.color.black));
-        binding.tvOffer.setTextColor(ContextCompat.getColor(this, R.color.black));
-        binding.tvOffer.setVisibility(View.GONE);
+        binding.flcountrguide.setBackgroundResource(0);
+        binding.iconcountrguide.setColorFilter(ContextCompat.getColor(this, R.color.
+                gray6));
+        binding.tvcountrguide.setTextColor(ContextCompat.getColor(this, R.color.
+                gray6));
+        // binding.tvOffer.setVisibility(View.GONE);
 
-        binding.flChat.setBackgroundResource(0);
-        binding.iconChat.setColorFilter(ContextCompat.getColor(this, R.color.black));
-        binding.tvChat.setTextColor(ContextCompat.getColor(this, R.color.black));
-        binding.tvChat.setVisibility(View.GONE);
+        binding.flNews.setBackgroundResource(0);
+        binding.iconNews.setColorFilter(ContextCompat.getColor(this, R.color.
+                gray6));
+        binding.tvNews.setTextColor(ContextCompat.getColor(this, R.color.
+                gray6));
+        // binding.       tvNews.setVisibility(View.GONE);
 
-        binding.flProfile.setBackgroundResource(R.drawable.small_rounded_btn_primary);
-        binding.iconProfile.setColorFilter(ContextCompat.getColor(this, R.color.white));
-        binding.tvProfile.setTextColor(ContextCompat.getColor(this, R.color.white));
+        binding.iconProfile.setColorFilter(ContextCompat.getColor(this, R.color.
+                colorPrimary));
+        binding.tvProfile.setTextColor(ContextCompat.getColor(this, R.color.
+                colorPrimary));
         binding.tvProfile.setVisibility(View.VISIBLE);
 
     }
 
-    private void updateChatUi() {
+    private void updateNewsUi() {
+        binding.flsearch.setVisibility(View.GONE);
 
         binding.flHome.setBackgroundResource(0);
-        binding.iconHome.setColorFilter(ContextCompat.getColor(this, R.color.black));
-        binding.tvHome.setTextColor(ContextCompat.getColor(this, R.color.black));
-        binding.tvHome.setVisibility(View.GONE);
+        binding.iconHome.setColorFilter(ContextCompat.getColor(this, R.color.
+                gray6));
+        binding.tvHome.setTextColor(ContextCompat.getColor(this, R.color.
+                gray6));
+        // binding.tvHome.setVisibility(View.GONE);
 
 
-        binding.flOffer.setBackgroundResource(0);
-        binding.iconOffer.setColorFilter(ContextCompat.getColor(this, R.color.black));
-        binding.tvOffer.setTextColor(ContextCompat.getColor(this, R.color.black));
-        binding.tvOffer.setVisibility(View.GONE);
+        binding.flcountrguide.setBackgroundResource(0);
+        binding.iconcountrguide.setColorFilter(ContextCompat.getColor(this, R.color.
+                gray6));
+        binding.tvcountrguide.setTextColor(ContextCompat.getColor(this, R.color.
+                gray6));
+        // binding.tvOffer.setVisibility(View.GONE);
 
 
-        binding.flChat.setBackgroundResource(R.drawable.small_rounded_btn_primary);
-        binding.iconChat.setColorFilter(ContextCompat.getColor(this, R.color.white));
-        binding.tvChat.setTextColor(ContextCompat.getColor(this, R.color.white));
-        binding.tvChat.setVisibility(View.VISIBLE);
+        binding.iconNews.setColorFilter(ContextCompat.getColor(this, R.color.
+                colorPrimary));
+        binding.tvNews.setTextColor(ContextCompat.getColor(this, R.color.
+                colorPrimary));
+        binding.tvNews.setVisibility(View.VISIBLE);
 
         binding.flProfile.setBackgroundResource(0);
-        binding.iconProfile.setColorFilter(ContextCompat.getColor(this, R.color.black));
-        binding.tvProfile.setTextColor(ContextCompat.getColor(this, R.color.black));
-        binding.tvProfile.setVisibility(View.GONE);
+        binding.iconProfile.setColorFilter(ContextCompat.getColor(this, R.color.
+                gray6));
+        binding.tvProfile.setTextColor(ContextCompat.getColor(this, R.color.
+                gray6));
+        //  binding.tvProfile.setVisibility(View.GONE);
 
     }
 
@@ -707,13 +844,12 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
     public void listenToNotifications(NotFireModel notFireModel) {
         if (userModel != null) {
             getNotificationCount();
-            if (fragment_chat != null && fragment_chat.isAdded()) {
-                fragment_chat.getRooms();
+            if (fragment_news != null && fragment_news.isAdded()) {
+                fragment_news.getRooms();
             }
 
         }
     }
-
 
     private void getNotificationCount() {
 
@@ -902,10 +1038,39 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
     }
 
     public void refreshFragmentOffers() {
-        if (fragment_offer != null && fragment_offer.isAdded()) {
-            fragment_offer.getData();
+        if (fragment_country_guide != null && fragment_country_guide.isAdded()) {
+            fragment_country_guide.getData();
         }
     }
 
+    public void slide(float slideOffset) {
+        float moveFactor = (float) ((binding.cardview.getWidth() * slideOffset) / 1.5);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            binding.cardview.setTranslationX(-moveFactor);
+            ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) binding.cardview.getLayoutParams();
+            if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                params.setMargins(0, 0, 0, 0);
+            } else {
+                params.setMargins(0, 200, 0, 200);
+            }
+            binding.cardview.setLayoutParams(params);
 
+        } else {
+            TranslateAnimation anim = new TranslateAnimation(lastTranslate, -moveFactor, 0.0f, 0.0f);
+            anim.setDuration(0);
+            anim.setFillAfter(true);
+
+            lastTranslate = -moveFactor;
+            ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) binding.cardview.getLayoutParams();
+            if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                params.setMargins(0, 0, 0, 0);
+            } else {
+                params.setMargins(0, 200, 0, 200);
+            }
+            binding.cardview.setLayoutParams(params);
+            binding.cardview.startAnimation(anim);
+
+        }
+
+    }
 }

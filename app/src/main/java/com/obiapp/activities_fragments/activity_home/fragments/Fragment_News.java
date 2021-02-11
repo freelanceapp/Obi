@@ -18,7 +18,7 @@ import com.obiapp.R;
 import com.obiapp.activities_fragments.activity_chat.ChatActivity;
 import com.obiapp.activities_fragments.activity_home.HomeActivity;
 import com.obiapp.adapters.RoomAdapter;
-import com.obiapp.databinding.FragmentChatBinding;
+import com.obiapp.databinding.FragmentNewsBinding;
 import com.obiapp.models.ChatUserModel;
 import com.obiapp.models.RoomDataModel;
 import com.obiapp.models.RoomModel;
@@ -39,25 +39,25 @@ import retrofit2.Response;
 
 import static android.app.Activity.RESULT_OK;
 
-public class Fragment_Chat extends Fragment {
+public class Fragment_News extends Fragment {
 
     private HomeActivity activity;
-    private FragmentChatBinding binding;
+    private FragmentNewsBinding binding;
     private Preferences preferences;
     private UserModel userModel;
     private String lang;
     private List<RoomModel> roomModelList;
     private RoomAdapter adapter;
 
-    public static Fragment_Chat newInstance() {
+    public static Fragment_News newInstance() {
 
-        return new Fragment_Chat();
+        return new Fragment_News();
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_chat, container, false);
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_news, container, false);
         return binding.getRoot();
     }
 

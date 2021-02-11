@@ -95,7 +95,7 @@ public class ChatUsActivity extends AppCompatActivity {
                 Toast.makeText(this, R.string.inv_url, Toast.LENGTH_SHORT).show();
             }
         });
-        binding.tvChat.setOnClickListener(view -> {
+        binding.tvNews.setOnClickListener(view -> {
             if (userModel==null){
                 Toast.makeText(this, getString(R.string.please_sign_in_or_sign_up), Toast.LENGTH_SHORT).show();
             }else {

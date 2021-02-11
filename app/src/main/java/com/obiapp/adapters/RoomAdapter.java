@@ -10,9 +10,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.obiapp.R;
-import com.obiapp.activities_fragments.activity_home.fragments.Fragment_Chat;
+import com.obiapp.activities_fragments.activity_home.fragments.Fragment_News;
 import com.obiapp.databinding.ChatRoomRowBinding;
-import com.obiapp.databinding.OfferRowBinding;
 import com.obiapp.models.RoomModel;
 
 import java.util.List;
@@ -44,10 +43,10 @@ public class RoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             MyHolder myHolder = (MyHolder) holder;
             myHolder.binding.setModel(list.get(position));
             myHolder.itemView.setOnClickListener(view -> {
-                if (fragment instanceof Fragment_Chat) {
+                if (fragment instanceof Fragment_News) {
 
-                    Fragment_Chat fragment_chat = (Fragment_Chat) fragment;
-                    fragment_chat.setRoomDate(list.get(myHolder.getAdapterPosition()));
+                    Fragment_News fragment_news = (Fragment_News) fragment;
+                    fragment_news.setRoomDate(list.get(myHolder.getAdapterPosition()));
                 }
             });
 

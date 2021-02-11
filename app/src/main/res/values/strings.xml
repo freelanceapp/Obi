@@ -134,6 +134,11 @@
     <string name="paid_once">Paid once</string>
     <string name="not_paid">Not paid</string>
     <string name="paid_more_than_one">Paid more than one</string>
+    <string name="the_most_recent">The Most Recent</string>
+    <string name="country_guide">Country guide</string>
+    <string name="news">News</string>
+    <string name="contactus">Contact Us</string>
+    <string name="aboutus">About Us</string>
     <string name="can_t_find_any_shop_or_service_try_different_criteria">Can\'t find any shop or service, try different criteria</string>
     <string name="km">Km</string>
     <string name="work_hour_not_aval">Work Hour Not Available</string>
