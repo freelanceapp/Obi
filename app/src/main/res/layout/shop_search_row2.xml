@@ -81,7 +81,7 @@
                app:layout_constraintStart_toStartOf="@id/tvName"
                app:layout_constraintBottom_toBottomOf="parent"
                android:src="@drawable/ic_marker"
-               android:tint="@color/gray9"
+               app:tint="@color/gray9"
                android:padding="2dp"
 
 
