@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+    <data>
+        <variable
+            name="lang"
+            type="String" />
+        <variable
+            name="distance"
+            type="String" />
+        <variable
+            name="model"
+            type="com.obiapp.models.google_models.NearbyModel.Result" />
+        <import type="android.view.View"/>
+    </data>
+   <LinearLayout
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       android:orientation="vertical"
+       >
+       <androidx.appcompat.widget.Toolbar
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:background="@color/gray0"
+           >
+           <androidx.constraintlayout.widget.ConstraintLayout
+               android:layout_width="match_parent"
+               android:layout_height="match_parent"
+               >
+               <FrameLayout
+                   android:id="@+id/flBack"
+                   android:layout_width="40dp"
+                   android:layout_height="40dp"
+                   app:layout_constraintTop_toTopOf="parent"
+                   app:layout_constraintBottom_toBottomOf="parent"
+                   app:layout_constraintStart_toStartOf="parent"
+                   >
+                   <de.hdodenhof.circleimageview.CircleImageView
+                       android:layout_width="match_parent"
+                       android:layout_height="match_parent"
+                       android:layout_gravity="center"
+                       android:src="@color/gray1_trans"
+                       android:clickable="false"
+                       android:longClickable="false"
+                       />
+                   <ImageView
+                       android:layout_width="24dp"
+                       android:layout_height="24dp"
+                       android:src="@drawable/ic_left_arrow"
+                       app:tint="@color/black"
+                       android:rotation='@{lang.equals("ar")?180:0}'
+                       android:layout_gravity="center"
+                       android:clickable="false"
+                       android:longClickable="false"
+                       android:padding="3dp"
+                       />
+
+               </FrameLayout>
+               <de.hdodenhof.circleimageview.CircleImageView
+                   android:id="@+id/image"
+                   android:layout_width="50dp"
+                   android:layout_height="50dp"
+                   app:layout_constraintTop_toTopOf="parent"
+                   app:layout_constraintBottom_toBottomOf="parent"
+                   app:layout_constraintStart_toEndOf="@id/flBack"
+                   android:layout_marginStart="10dp"
+                   android:layout_marginEnd="10dp"
+                   app:civ_border_width="0dp"
+                   />
+               <TextView
+                   android:id="@+id/tvName"
+                   android:layout_width="0dp"
+                   android:layout_height="wrap_content"
+                   app:layout_constraintTop_toTopOf="parent"
+                   app:layout_constraintStart_toEndOf="@id/image"
+                   app:layout_constraintEnd_toEndOf="parent"
+                   android:layout_marginStart="10dp"
+                   android:layout_marginEnd="10dp"
+                   android:textColor="@color/gray11"
+                   android:textSize="13sp"
+                   android:text="@{model.name}"
+                   android:marqueeRepeatLimit="marquee_forever"
+                   android:scrollHorizontally="true"
+                   android:ellipsize="marquee"
+                   android:singleLine="true"
+                   android:focusable="true"
+                   android:focusableInTouchMode="true"
+                   />
+
+
+           </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+       </androidx.appcompat.widget.Toolbar>
+       <FrameLayout
+           android:layout_width="match_parent"
+           android:layout_height="0dp"
+           android:layout_weight="1"
+           >
+           <fragment
+               android:id="@+id/map"
+               android:layout_width="match_parent"
+               android:layout_height="match_parent"
+               android:name="com.google.android.gms.maps.SupportMapFragment"
+               />
+
+           <LinearLayout
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:layout_gravity="bottom"
+               android:orientation="vertical"
+               >
+               <androidx.constraintlayout.widget.ConstraintLayout
+                   android:layout_width="match_parent"
+                   android:layout_height="40dp"
+                   android:layout_marginTop="10dp"
+                   android:background="@color/white"
+                   >
+                   <FrameLayout
+                       android:id="@+id/flIcon"
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       app:layout_constraintTop_toTopOf="parent"
+                       app:layout_constraintStart_toStartOf="parent"
+                       app:layout_constraintBottom_toBottomOf="parent"
+                       android:layout_marginStart="10dp"
+                       android:layout_marginEnd="10dp"
+
+                       >
+                       <ImageView
+                           android:id="@+id/icon"
+                           android:layout_width="15dp"
+                           android:layout_height="15dp"
+                           android:src="@{model.open?@drawable/ic_clock2:@drawable/ic_clock3}"
+                           android:visibility="gone"
+                           android:layout_gravity="center"
+                           />
+
+                   </FrameLayout>
+
+                   <TextView
+                       android:id="@+id/tvStatus"
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       app:layout_constraintTop_toTopOf="parent"
+                       app:layout_constraintBottom_toBottomOf="parent"
+                       app:layout_constraintStart_toEndOf="@+id/flIcon"
+                       android:textSize="13sp"
+                       android:textColor="@color/colorPrimary"
+                       android:layout_marginStart="5dp"
+                       android:layout_marginEnd="5dp"
+                       android:text="@{model.open?@string/open_now:@string/closed}"
+                       android:visibility="gone"
+                       />
+
+
+
+                   <TextView
+                       android:id="@+id/tvShow"
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       app:layout_constraintTop_toTopOf="parent"
+                       app:layout_constraintBottom_toBottomOf="parent"
+                       app:layout_constraintEnd_toStartOf="@id/arrow2"
+                       android:layout_marginStart="5dp"
+                       android:layout_marginEnd="5dp"
+                       android:textColor="@color/colorPrimary"
+                       android:textSize="12sp"
+                       android:text="@string/show"
+                       android:clickable="false"
+                       android:longClickable="false"
+                       android:visibility="gone"
+                       />
+                   <ImageView
+                       android:id="@+id/arrow2"
+                       android:layout_width="20dp"
+                       android:layout_height="20dp"
+                       app:layout_constraintTop_toTopOf="parent"
+                       app:layout_constraintBottom_toBottomOf="parent"
+                       app:layout_constraintEnd_toEndOf="parent"
+                       android:src="@drawable/ic_arrow_down2"
+                       app:tint="@color/colorPrimary"
+                       android:padding="2dp"
+                       android:rotation='@{lang.equals("ar")?180:0}'
+                       android:visibility="gone"
+                       android:layout_marginStart="10dp"
+                       android:layout_marginEnd="10dp"
+
+                       />
+
+                   <ProgressBar
+                       android:id="@+id/progBar"
+                       android:layout_width="20dp"
+                       android:layout_height="20dp"
+                       android:layout_gravity="center"
+                       app:layout_constraintEnd_toEndOf="parent"
+                       app:layout_constraintTop_toTopOf="parent"
+                       app:layout_constraintBottom_toBottomOf="parent"
+                       android:layout_marginStart="10dp"
+                       android:layout_marginEnd="10dp"
+                       />
+
+               </androidx.constraintlayout.widget.ConstraintLayout>
+
+               <net.cachapa.expandablelayout.ExpandableLayout
+                   android:id="@+id/expandLayout"
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content"
+                   app:el_expanded="false"
+                   app:el_parallax=".5"
+                   app:el_duration="1000"
+                   android:background="@color/white"
+                   >
+                   <androidx.recyclerview.widget.RecyclerView
+                       android:id="@+id/recView"
+                       android:layout_width="match_parent"
+                       android:layout_height="wrap_content"/>
+               </net.cachapa.expandablelayout.ExpandableLayout>
+
+               <View
+                   android:layout_width="match_parent"
+                   android:layout_height="1dp"
+                   android:background="@color/gray3"
+                   />
+           </LinearLayout>
+       </FrameLayout>
+
+
+       <androidx.constraintlayout.widget.ConstraintLayout
+           android:layout_width="match_parent"
+           android:layout_height="50dp"
+           android:background="@color/white"
+           >
+           <ImageView
+               android:id="@+id/imagePin"
+               android:layout_width="20dp"
+               android:layout_height="20dp"
+               app:layout_constraintTop_toTopOf="parent"
+               app:layout_constraintStart_toStartOf="parent"
+               android:layout_marginStart="10dp"
+               android:layout_marginEnd="10dp"
+               app:civ_border_width="0dp"
+               android:layout_marginTop="5dp"
+               android:src="@drawable/ic_pin3"
+               app:tint="@color/colorPrimary"
+               />
+
+           <TextView
+               android:id="@+id/tvAddress"
+               android:layout_width="0dp"
+               android:layout_height="wrap_content"
+               app:layout_constraintTop_toTopOf="parent"
+               app:layout_constraintStart_toEndOf="@id/imagePin"
+               app:layout_constraintEnd_toEndOf="parent"
+               android:layout_marginStart="10dp"
+               android:layout_marginEnd="10dp"
+               android:textColor="@color/gray11"
+               android:textSize="12sp"
+               android:singleLine="true"
+               android:layout_marginTop="5dp"
+               android:text="@{model.vicinity}"
+               />
+           <TextView
+               android:id="@+id/tvDistance"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               app:layout_constraintTop_toBottomOf="@id/tvAddress"
+               app:layout_constraintStart_toEndOf="@id/imagePin"
+               android:layout_marginStart="10dp"
+               android:layout_marginEnd="10dp"
+               android:textColor="@color/gray11"
+               android:textSize="10sp"
+               android:text='@{distance+" "+@string/km}'
+               android:singleLine="true"
+               android:layout_marginTop="5dp"
+               tools:ignore="SmallSp" />
+
+
+
+
+
+       </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+   </LinearLayout>
+</layout>

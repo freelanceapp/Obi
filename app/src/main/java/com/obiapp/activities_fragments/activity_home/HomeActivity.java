@@ -1,12 +1,17 @@
 package com.obiapp.activities_fragments.activity_home;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -17,12 +22,25 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.obiapp.R;
 import com.obiapp.activities_fragments.activity_department_details.DepartmentDetailsActivity;
@@ -59,7 +77,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, LocationListener {
     private ActivityHomeBinding binding;
     private Preferences preferences;
     private FragmentManager fragmentManager;
@@ -73,6 +91,12 @@ public class HomeActivity extends AppCompatActivity {
     private List<DepartmentModel> departmentModelList;
     private ExpandDepartmentAdapter expandDepartmentAdapter;
     private int parent_pos = -1, child_pos = -1;
+    private GoogleApiClient googleApiClient;
+    private LocationRequest locationRequest;
+    private LocationCallback locationCallback;
+    private final String gps_perm = Manifest.permission.ACCESS_FINE_LOCATION;
+    private final int loc_req = 22;
+    public double lat = 0.0, lng = 0.0;
 
 
     protected void attachBaseContext(Context newBase) {
@@ -148,9 +172,9 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable editable) {
 
-                  if(fragment_home!=null){
-                      fragment_home.search(editable.toString());
-                  }
+                if (fragment_home != null) {
+                    fragment_home.search(editable.toString());
+                }
 
             }
         });
@@ -164,7 +188,6 @@ public class HomeActivity extends AppCompatActivity {
         });
 
 
-        displayFragmentMain();
 
         if (userModel != null) {
             EventBus.getDefault().register(this);
@@ -172,9 +195,9 @@ public class HomeActivity extends AppCompatActivity {
 
         }
 
-
         binding.swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
         binding.swipeRefresh.setOnRefreshListener(this::getDepartments);
+        CheckPermission();
         getDepartments();
 
     }
@@ -684,13 +707,12 @@ public class HomeActivity extends AppCompatActivity {
     public void listenToNotifications(NotFireModel notFireModel) {
         if (userModel != null) {
             getNotificationCount();
-            if (fragment_chat!=null&&fragment_chat.isAdded()){
+            if (fragment_chat != null && fragment_chat.isAdded()) {
                 fragment_chat.getRooms();
             }
 
         }
     }
-
 
 
     private void getNotificationCount() {
@@ -719,11 +741,117 @@ public class HomeActivity extends AppCompatActivity {
     }
 
 
+    private void initGoogleApiClient() {
+        googleApiClient = new GoogleApiClient.Builder(this)
+                .addOnConnectionFailedListener(this)
+                .addConnectionCallbacks(this)
+                .addApi(LocationServices.API)
+                .build();
+        googleApiClient.connect();
+    }
+
+    private void CheckPermission() {
+        if (ActivityCompat.checkSelfPermission(this, gps_perm) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{gps_perm}, loc_req);
+        } else {
+
+            initGoogleApiClient();
+
+        }
+    }
+
+
+    private void initLocationRequest() {
+        locationRequest = LocationRequest.create();
+        locationRequest.setFastestInterval(1000);
+        locationRequest.setInterval(60000);
+        LocationSettingsRequest.Builder request = new LocationSettingsRequest.Builder();
+        request.addLocationRequest(locationRequest);
+        request.setAlwaysShow(false);
+
+        PendingResult<LocationSettingsResult> result = LocationServices.SettingsApi.checkLocationSettings(googleApiClient, request.build());
+
+        result.setResultCallback(result1 -> {
+
+            Status status = result1.getStatus();
+            switch (status.getStatusCode()) {
+                case LocationSettingsStatusCodes.SUCCESS:
+                    startLocationUpdate();
+                    break;
+                case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                    try {
+                        status.startResolutionForResult(HomeActivity.this, 1255);
+                    } catch (Exception e) {
+                    }
+                    break;
+                case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                    Log.e("not available", "not available");
+                    break;
+            }
+        });
+
+    }
+
+    @SuppressLint("MissingPermission")
+    private void startLocationUpdate() {
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                onLocationChanged(locationResult.getLastLocation());
+            }
+        };
+        LocationServices.getFusedLocationProviderClient(this)
+                .requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        initLocationRequest();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        if (googleApiClient != null) {
+            googleApiClient.connect();
+        }
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        lat = location.getLatitude();
+        lng = location.getLongitude();
+        displayFragmentMain();
+        binding.tvLocation.setVisibility(View.GONE);
+        binding.coordData.setVisibility(View.VISIBLE);
+        if (googleApiClient != null) {
+            googleApiClient.disconnect();
+        }
+        if (locationCallback != null) {
+            LocationServices.getFusedLocationProviderClient(this).removeLocationUpdates(locationCallback);
+        }
+    }
+
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         if (EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().unregister(this);
+        }
+
+        if (googleApiClient!=null){
+            googleApiClient.disconnect();
+            googleApiClient=null;
+        }
+
+        if (locationCallback!=null){
+            LocationServices.getFusedLocationProviderClient(this).removeLocationUpdates(locationCallback);
+
         }
     }
 
@@ -735,6 +863,10 @@ public class HomeActivity extends AppCompatActivity {
         for (Fragment fragment : fragmentList) {
             fragment.onActivityResult(requestCode, resultCode, data);
         }
+        if (requestCode == 1255 && resultCode == RESULT_OK) {
+            startLocationUpdate();
+
+        }
 
 
     }
@@ -745,6 +877,15 @@ public class HomeActivity extends AppCompatActivity {
         List<Fragment> fragmentList = fragmentManager.getFragments();
         for (Fragment fragment : fragmentList) {
             fragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+
+        if (requestCode == loc_req) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                initGoogleApiClient();
+
+            } else {
+                Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 

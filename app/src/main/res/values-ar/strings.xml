@@ -40,7 +40,7 @@
     <string name="skip">تخطى</string>
     <string name="just_now">الان</string>
     <string name="a_minute_ago">منذ د</string>
-    <string name="min">min</string>
+    <string name="min">د</string>
     <string name="an_hour_ago">منذ س</string>
     <string name="hs">س</string>
     <string name="yesterday">امس</string>
@@ -133,5 +133,10 @@
     <string name="paid_once">تم دفع العمولة مرة واحدة</string>
     <string name="not_paid">لم يدفع من قبل</string>
     <string name="paid_more_than_one">دفع اكثر من مرة</string>
+    <string name="can_t_find_any_shop_or_service_try_different_criteria">لا يمكن العثور على أي متجر ابحث عنة فى الخريطة</string>
+    <string name="km">كم</string>
+    <string name="work_hour_not_aval">ساعات العمل غير متاحة</string>
+    <string name="home3">موقعي</string>
+    <string name="getting_your_location">جار تحديد موقعك...</string>
 
 </resources>

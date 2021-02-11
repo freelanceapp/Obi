@@ -23,6 +23,9 @@ import com.obiapp.models.SliderModel;
 import com.obiapp.models.StatusResponse;
 import com.obiapp.models.TypeDataModel;
 import com.obiapp.models.UserModel;
+import com.obiapp.models.google_models.CategoryDataModel;
+import com.obiapp.models.google_models.NearbyModel;
+import com.obiapp.models.google_models.PlaceDetailsModel;
 
 import java.util.List;
 import java.util.Map;
@@ -439,6 +442,25 @@ public interface Service {
     @GET("api/categories")
     Call<AllCatogryModel> getcategories(
 
+    );
+
+    @GET("api/google-categories")
+    Call<CategoryDataModel> getGoogleCategory();
+
+    @GET("place/nearbysearch/json")
+    Call<NearbyModel> nearbyPlaceRankBy(@Query(value = "location") String location,
+                                        @Query(value = "keyword") String keyword,
+                                        @Query(value = "rankby") String rankby,
+                                        @Query(value = "language") String language,
+                                        @Query(value = "pagetoken") String pagetoken,
+                                        @Query(value = "key") String key
+    );
+
+    @GET("place/details/json")
+    Call<PlaceDetailsModel> getPlaceDetails(@Query(value = "placeid") String placeid,
+                                            @Query(value = "fields") String fields,
+                                            @Query(value = "language") String language,
+                                            @Query(value = "key") String key
     );
 
 }

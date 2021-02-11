@@ -23,7 +23,7 @@ import com.obiapp.activities_fragments.activity_my_ads.MyAdsActivity;
 import com.obiapp.activities_fragments.activity_my_favorite.MyFavoriteActivity;
 import com.obiapp.activities_fragments.activity_setting.SettingActivity;
 import com.obiapp.activities_fragments.activity_sign_up.SignUpActivity;
-import com.obiapp.activity_contact_us.ContactUsActivity;
+import com.obiapp.activities_fragments.activity_contact_us.ContactUsActivity;
 import com.obiapp.databinding.FragmentProfileBinding;
 import com.obiapp.interfaces.Listeners;
 import com.obiapp.models.UserModel;

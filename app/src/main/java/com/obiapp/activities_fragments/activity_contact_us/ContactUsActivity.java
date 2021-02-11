@@ -1,4 +1,4 @@
-package com.obiapp.activity_contact_us;
+package com.obiapp.activities_fragments.activity_contact_us;
 
 import android.app.ProgressDialog;
 import android.content.Context;
